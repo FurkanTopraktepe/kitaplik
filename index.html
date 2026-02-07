@@ -95,6 +95,19 @@
       </svg>
     );
 
+    const Fire = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.1 1-2.2 2-3.2 1 1.1 1 2.2 1 3.3z" />
+      </svg>
+    );
+
+    const Clock = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    );
+
     const BookshelfApp = () => {
       const [view, setView] = useState('library');
 
@@ -105,6 +118,42 @@
       });
 
       const genres = ['Roman', 'Bilim Kurgu', 'Dünya Klasikleri', 'Kişisel Gelişim', 'Tarih', 'Felsefe', 'Diğer'];
+
+
+      // Initialize Reading Goals & Streak
+      const [readingGoal, setReadingGoal] = useState(() => {
+        const saved = localStorage.getItem('bookshelf_readingGoal');
+        return saved ? JSON.parse(saved) : 30; // 30 mins default
+      });
+
+      const [streakData, setStreakData] = useState(() => {
+        const saved = localStorage.getItem('bookshelf_streakData');
+        const today = new Date().toISOString().split('T')[0];
+        const defaultData = { streak: 0, lastReadDate: '', dailyProgress: { date: today, minutes: 0 } };
+
+        if (!saved) return defaultData;
+
+        const data = JSON.parse(saved);
+
+        // Reset daily progress if it's a new day
+        if (data.dailyProgress.date !== today) {
+          // Check if streak was broken (yesterday was skipped)
+          const lastRead = new Date(data.lastReadDate);
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          // Simple streak logic: if last read date is NOT yesterday and NOT today, reset streak
+          // Note: This is a simplified check. For robust logic we'd compare dates properly.
+          // If lastReadDate is empty, streak is 0.
+          if (data.lastReadDate && data.lastReadDate !== today && data.lastReadDate !== yesterday.toISOString().split('T')[0]) {
+            data.streak = 0;
+          }
+
+          data.dailyProgress = { date: today, minutes: 0 };
+        }
+
+        return data;
+      });
 
       // Initialize books from localStorage
       const [books, setBooks] = useState(() => {
@@ -170,8 +219,20 @@
         localStorage.setItem('bookshelf_books', JSON.stringify(books));
       }, [books]);
 
+      // Save reading goal
+      useEffect(() => {
+        localStorage.setItem('bookshelf_readingGoal', JSON.stringify(readingGoal));
+      }, [readingGoal]);
+
+      // Save streak data
+      useEffect(() => {
+        localStorage.setItem('bookshelf_streakData', JSON.stringify(streakData));
+      }, [streakData]);
+
       const [selectedBook, setSelectedBook] = useState(null);
       const [showAddBook, setShowAddBook] = useState(false);
+      const [showLogReading, setShowLogReading] = useState(false);
+      const [logMinutes, setLogMinutes] = useState('');
       const [newBook, setNewBook] = useState({
         title: '',
         author: '',
@@ -227,6 +288,39 @@
         if (highlight.trim()) {
           const book = books.find(b => b.id === bookId);
           updateBook(bookId, { highlights: [...book.highlights, highlight] });
+        }
+      };
+
+      const logReadingTime = () => {
+        const minutes = parseInt(logMinutes);
+        if (!isNaN(minutes) && minutes > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          const newProgress = streakData.dailyProgress.minutes + minutes;
+          let newStreak = streakData.streak;
+          let newLastReadDate = streakData.lastReadDate;
+
+          // If goal reached today and wasn't reached before today
+          if (newProgress >= readingGoal && streakData.dailyProgress.minutes < readingGoal) {
+            // Only increment streak if we haven't already counted today (check lastReadDate)
+            if (streakData.lastReadDate !== today) {
+              newStreak += 1;
+              newLastReadDate = today;
+            }
+          }
+
+          // Even if goal not reached, we might want to update lastReadDate if we want to support "any reading counts"
+          // usage, but per requirements usually streak is tied to goal. 
+          // Let's stick to "Streak increases when goal met".
+
+          setStreakData({
+            ...streakData,
+            streak: newStreak,
+            lastReadDate: newLastReadDate,
+            dailyProgress: { ...streakData.dailyProgress, minutes: newProgress }
+          });
+
+          setLogMinutes('');
+          setShowLogReading(false);
         }
       };
 
@@ -411,16 +505,54 @@
                 Kitaplığım
               </h1>
 
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={`p-3 rounded-full transition-all ${darkMode
-                  ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
-                  : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
-                  }`}
-                title={darkMode ? 'Gündüz Modu' : 'Gece Modu'}
-              >
-                {darkMode ? <Sun size={24} /> : <Moon size={24} />}
-              </button>
+              <div className="flex items-center gap-4">
+                {/* Streak & Progress Widget */}
+                <div className={`flex items-center gap-4 px-4 py-2 rounded-lg shadow-md ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                  <div className="flex items-center gap-1" title={`${streakData.streak} Günlük Seri`}>
+                    <Fire size={20} className={`${streakData.streak > 0 ? 'text-orange-500 fill-orange-500' : 'text-gray-400'}`} />
+                    <span className={`font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{streakData.streak}</span>
+                  </div>
+                  <div className="w-px h-6 bg-current opacity-20"></div>
+                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowLogReading(true)} title="Okuma Ekle">
+                    <div className="relative w-8 h-8">
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle
+                          cx="16" cy="16" r="14"
+                          stroke="currentColor" strokeWidth="3" fill="none"
+                          className="opacity-20"
+                        />
+                        <circle
+                          cx="16" cy="16" r="14"
+                          stroke="currentColor" strokeWidth="3" fill="none"
+                          strokeDasharray={88}
+                          strokeDashoffset={88 - (Math.min(streakData.dailyProgress.minutes, readingGoal) / readingGoal) * 88}
+                          className={`${streakData.dailyProgress.minutes >= readingGoal ? 'text-green-500' : 'text-blue-500'} transition-all duration-500`}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[10px] font-bold">{Math.round((streakData.dailyProgress.minutes / readingGoal) * 100)}%</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={`text-xs font-bold leading-none ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                        {streakData.dailyProgress.minutes} / {readingGoal} dk
+                      </span>
+                      <span className="text-[10px] opacity-70">Bugünkü Hedef</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`p-3 rounded-full transition-all ${darkMode
+                    ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
+                    : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
+                    }`}
+                  title={darkMode ? 'Gündüz Modu' : 'Gece Modu'}
+                >
+                  {darkMode ? <Sun size={24} /> : <Moon size={24} />}
+                </button>
+              </div>
             </div>
 
             {/* Navigation */}
@@ -586,6 +718,22 @@
                     <Star size={24} fill="#FFD700" stroke="#FFD700" />
                   </p>
                 </div>
+
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Günlük Hedef</h3>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={readingGoal}
+                      onChange={(e) => setReadingGoal(Number(e.target.value))}
+                      className={`w-20 p-2 border-2 rounded text-xl font-bold ${darkMode
+                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                        }`}
+                    />
+                    <span className={`text-xl ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>dk</span>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -681,6 +829,50 @@
                     className="w-full py-3 bg-[#7B3F3F] text-white rounded-lg font-semibold hover:bg-[#5D3030] transition-colors"
                   >
                     Ekle
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Log Reading Modal */}
+          {showLogReading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className={`rounded-lg max-w-sm w-full p-8 relative shadow-2xl ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <button
+                  onClick={() => setShowLogReading(false)}
+                  className={`absolute top-4 right-4 ${darkMode ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
+                >
+                  <X size={24} />
+                </button>
+
+                <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                  <Clock size={28} />
+                  Okuma Kaydet
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kaç dakika okudun?</label>
+                    <input
+                      type="number"
+                      value={logMinutes}
+                      onChange={(e) => setLogMinutes(e.target.value)}
+                      placeholder="Örn: 30"
+                      autoFocus
+                      className={`w-full p-3 border-2 rounded-lg text-lg ${darkMode
+                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                        }`}
+                      onKeyPress={(e) => e.key === 'Enter' && logReadingTime()}
+                    />
+                  </div>
+
+                  <button
+                    onClick={logReadingTime}
+                    className="w-full py-3 bg-[#7B3F3F] text-white rounded-lg font-semibold hover:bg-[#5D3030] transition-colors"
+                  >
+                    Kaydet
                   </button>
                 </div>
               </div>
