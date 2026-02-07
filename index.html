@@ -108,6 +108,22 @@
       </svg>
     );
 
+    const Download = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+    );
+
+    const Upload = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+      </svg>
+    );
+
     const BookshelfApp = () => {
       const [view, setView] = useState('library');
 
@@ -308,10 +324,6 @@
             }
           }
 
-          // Even if goal not reached, we might want to update lastReadDate if we want to support "any reading counts"
-          // usage, but per requirements usually streak is tied to goal. 
-          // Let's stick to "Streak increases when goal met".
-
           setStreakData({
             ...streakData,
             streak: newStreak,
@@ -322,6 +334,58 @@
           setLogMinutes('');
           setShowLogReading(false);
         }
+      };
+
+      const exportData = () => {
+        const data = {
+          books,
+          readingGoal,
+          streakData,
+          darkMode, // optionally export settings too
+          exportDate: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bookshelf_backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      const importData = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+
+            // Basic validation
+            if (!Array.isArray(data.books)) {
+              alert('Geçersiz yedek dosyası formatı!');
+              return;
+            }
+
+            if (window.confirm('Mevcut verilerin üzerine yazılacak. Emin misiniz?')) {
+              setBooks(data.books);
+              if (data.readingGoal) setReadingGoal(data.readingGoal);
+              if (data.streakData) setStreakData(data.streakData);
+              if (data.darkMode !== undefined) setDarkMode(data.darkMode);
+              alert('Veriler başarıyla geri yüklendi!');
+            }
+          } catch (error) {
+            alert('Dosya okunamadı. JSON formatı hatalı olabilir.');
+            console.error(error);
+          }
+        };
+        reader.readAsText(file);
+        // Reset input so same file can be selected again if needed
+        event.target.value = null;
       };
 
       const stats = {
@@ -732,6 +796,36 @@
                         }`}
                     />
                     <span className={`text-xl ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>dk</span>
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Veri Yönetimi</h3>
+                  <div className="flex flex-wrap gap-4">
+                    <button
+                      onClick={exportData}
+                      className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors ${darkMode
+                          ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                          : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
+                        }`}
+                    >
+                      <Download size={20} />
+                      Yedeği İndir
+                    </button>
+
+                    <label className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors cursor-pointer ${darkMode
+                        ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                        : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
+                      }`}>
+                      <Upload size={20} />
+                      Yedeği Geri Yükle
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={importData}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
                 </div>
               </div>
