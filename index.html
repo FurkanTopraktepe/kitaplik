@@ -45,6 +45,13 @@
       </svg>
     );
 
+    const Award = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="12" cy="8" r="7" />
+        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+      </svg>
+    );
+
     const Search = ({ size = 24, ...props }) => (
       <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <circle cx="11" cy="11" r="8" />
@@ -140,6 +147,11 @@
       const [readingGoal, setReadingGoal] = useState(() => {
         const saved = localStorage.getItem('bookshelf_readingGoal');
         return saved ? JSON.parse(saved) : 30; // 30 mins default
+      });
+
+      const [annualGoal, setAnnualGoal] = useState(() => {
+        const saved = localStorage.getItem('bookshelf_annualGoal');
+        return saved ? JSON.parse(saved) : 20; // 20 books default
       });
 
       const [streakData, setStreakData] = useState(() => {
@@ -240,6 +252,11 @@
         localStorage.setItem('bookshelf_readingGoal', JSON.stringify(readingGoal));
       }, [readingGoal]);
 
+      // Save annual goal
+      useEffect(() => {
+        localStorage.setItem('bookshelf_annualGoal', JSON.stringify(annualGoal));
+      }, [annualGoal]);
+
       // Save streak data
       useEffect(() => {
         localStorage.setItem('bookshelf_streakData', JSON.stringify(streakData));
@@ -257,7 +274,9 @@
         rating: 0,
         status: 'want-to-read',
         review: '',
-        highlights: []
+        highlights: [],
+        totalPages: '',
+        currentPage: 0
       });
       const [searchQuery, setSearchQuery] = useState('');
 
@@ -278,7 +297,9 @@
             rating: 0,
             status: 'want-to-read',
             review: '',
-            highlights: []
+            highlights: [],
+            totalPages: '',
+            currentPage: 0
           });
           setShowAddBook(false);
         }
@@ -416,6 +437,14 @@
               {book.title}
             </span>
           </div>
+          {book.totalPages > 0 && book.currentPage > 0 && book.status === 'reading' && (
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+              <div
+                className="h-full bg-green-500"
+                style={{ width: `${Math.min((book.currentPage / book.totalPages) * 100, 100)}%` }}
+              />
+            </div>
+          )}
           {book.rating > 0 && (
             <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-0.5">
               <Star size={10} fill="#FFD700" stroke="#FFD700" />
@@ -465,20 +494,57 @@
                     </button>
                   </div>
 
-                  <div className="mb-4">
-                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
-                    <select
-                      value={book.status}
-                      onChange={(e) => updateBook(book.id, { status: e.target.value })}
-                      className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
-                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                        }`}
-                    >
-                      <option value="want-to-read">Okunacak</option>
-                      <option value="reading">Okunuyor</option>
-                      <option value="read">Okundu</option>
-                    </select>
+                  <div className="mb-4 text-xs font-semibold">
+                    {book.totalPages > 0 && (
+                      <div className={`p-2 rounded flex items-center gap-2 mb-2 ${darkMode ? 'bg-[#1A1410] text-[#B89968]' : 'bg-[#E8DCC8] text-[#654321]'}`}>
+                        <div className="flex-1">
+                          <div className="flex justify-between mb-1">
+                            <span>İlerleme: Sayfa {book.currentPage || 0} / {book.totalPages}</span>
+                            <span>{Math.round(((book.currentPage || 0) / book.totalPages) * 100)}%</span>
+                          </div>
+                          <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="bg-[#7B3F3F] h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.min(((book.currentPage || 0) / book.totalPages) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex-1">
+                      <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
+                      <select
+                        value={book.status}
+                        onChange={(e) => updateBook(book.id, { status: e.target.value })}
+                        className={`w-full p-2 border-2 rounded ${darkMode
+                          ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                          }`}
+                      >
+                        <option value="want-to-read">Okunacak</option>
+                        <option value="reading">Okunuyor</option>
+                        <option value="read">Okundu</option>
+                      </select>
+                    </div>
+
+                    <div className="flex-1">
+                      <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Şu Anki Sayfa</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={book.currentPage || ''}
+                          onChange={(e) => updateBook(book.id, { currentPage: Number(e.target.value) })}
+                          placeholder={book.totalPages ? `/ ${book.totalPages}` : '0'}
+                          className={`w-full p-2 border-2 rounded ${darkMode
+                            ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                            : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                            }`}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="mb-4">
@@ -800,13 +866,44 @@
                 </div>
 
                 <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>
+                    <Award size={24} />
+                    {new Date().getFullYear()} Okuma Hedefi (Challenge)
+                  </h3>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="flex-1 h-4 bg-gray-300 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-1000"
+                        style={{ width: `${Math.min((stats.read / annualGoal) * 100, 100)}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{Math.round((stats.read / annualGoal) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className={`${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Okunan: <b>{stats.read}</b> Kitap</span>
+                    <div className="flex items-center gap-1">
+                      <span className={`${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Hedef:</span>
+                      <input
+                        type="number"
+                        value={annualGoal}
+                        onChange={(e) => setAnnualGoal(Number(e.target.value))}
+                        className={`w-16 p-1 text-center border rounded font-bold ${darkMode
+                          ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                          }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Veri Yönetimi</h3>
                   <div className="flex flex-wrap gap-4">
                     <button
                       onClick={exportData}
                       className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors ${darkMode
-                          ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
-                          : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
+                        ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                        : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                         }`}
                     >
                       <Download size={20} />
@@ -814,8 +911,8 @@
                     </button>
 
                     <label className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors cursor-pointer ${darkMode
-                        ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
-                        : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
+                      ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                      : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                       }`}>
                       <Upload size={20} />
                       Yedeği Geri Yükle
@@ -865,6 +962,20 @@
                       type="text"
                       value={newBook.author}
                       onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
+                      className={`w-full p-2 border-2 rounded ${darkMode
+                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                        }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Toplam Sayfa</label>
+                    <input
+                      type="number"
+                      value={newBook.totalPages}
+                      onChange={(e) => setNewBook({ ...newBook, totalPages: Number(e.target.value) })}
+                      placeholder="Örn: 350"
                       className={`w-full p-2 border-2 rounded ${darkMode
                         ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
