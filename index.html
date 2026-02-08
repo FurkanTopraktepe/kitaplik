@@ -466,10 +466,10 @@
 
       return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative shadow-2xl ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+          <div className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative shadow-2xl ${themeColors.card} ${themeColors.border} border-2`}>
             <button
               onClick={onClose}
-              className={`absolute top-4 right-4 ${isDark ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
+              className={`absolute top-4 right-4 ${themeColors.text} opacity-70 hover:opacity-100 transition-opacity`}
             >
               <X size={24} />
             </button>
@@ -490,9 +490,9 @@
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className={`text-3xl font-bold mb-1 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{book.title}</h2>
-                    <p className={`text-lg mb-2 ${isDark ? 'text-[#B89968]' : 'text-[#8B4513]'}`}>{book.author}</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${isDark ? 'bg-[#4A3B2F] text-[#B89968]' : 'bg-[#C8A882] text-[#654321]'}`}>
+                    <h2 className={`text-3xl font-bold mb-1 ${themeColors.text}`}>{book.title}</h2>
+                    <p className={`text-lg mb-2 ${themeColors.accent}`}>{book.author}</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${themeColors.button}`}>
                       {book.genre || 'Tür Belirtilmemiş'}
                     </span>
                   </div>
@@ -501,7 +501,7 @@
 
                 <div className="mb-4 text-xs font-semibold">
                   {book.totalPages > 0 && (
-                    <div className={`p-2 rounded flex items-center gap-2 mb-2 ${isDark ? 'bg-[#2D2620] text-[#B89968]' : 'bg-[#E8DCC8] text-[#654321]'}`}>
+                    <div className={`p-2 rounded flex items-center gap-2 mb-2 ${themeColors.widget}`}>
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span>İlerleme: Sayfa {book.currentPage || 0} / {book.totalPages}</span>
@@ -655,8 +655,8 @@
 
               <div className="space-y-3 mb-3">
                 {book.highlights.map((highlight, idx) => (
-                  <div key={idx} className={`p-3 rounded border-l-4 border-[#7B3F3F] shadow-sm ${isDark ? 'bg-[#2D2620]' : 'bg-[#E8DCC8]'}`}>
-                    <p className={`italic ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>"{highlight}"</p>
+                  <div key={idx} className={`p-3 rounded border-l-4 border-orange-500 shadow-sm ${themeColors.widget}`}>
+                    <p className={`italic ${themeColors.text}`}>"{highlight}"</p>
                   </div>
                 ))}
               </div>
@@ -710,10 +710,83 @@
       // Dynamic Styles based on Theme
       const getThemeColors = () => {
         switch (theme) {
-          case 'dark': return { bg: 'bg-[#26201B]', text: 'text-[#E8D4BA]', accent: 'text-[#B89968]', card: 'bg-[#382E26]', border: 'border-[#3E2B20]' };
-          case 'walnut': return { bg: 'bg-[#3E2723]', text: 'text-[#D7CCC8]', accent: 'text-[#A1887F]', card: 'bg-[#4E342E]', border: 'border-[#5D4037]' };
-          case 'white': return { bg: 'bg-[#F5F5F5]', text: 'text-[#212121]', accent: 'text-[#757575]', card: 'bg-[#FFFFFF]', border: 'border-[#E0E0E0]' };
-          case 'oak': default: return { bg: 'bg-[#E8DCC8]', text: 'text-[#654321]', accent: 'text-[#8B4513]', card: 'bg-[#D4B896]', border: 'border-[#C8A882]' };
+          case 'dark':
+            return {
+              bg: 'bg-[#121212]',
+              text: 'text-[#E5E5E5]',
+              accent: 'text-[#BB86FC]',
+              card: 'bg-[#1E1E1E]',
+              border: 'border-[#333333]',
+              sidebar: 'bg-[#1A1A1A]',
+              button: 'bg-[#332940] hover:bg-[#453756] text-[#BB86FC]',
+              widget: 'bg-[#252525] border border-[#333333]'
+            };
+          case 'midnight':
+            return {
+              bg: 'bg-[#0F172A]',
+              text: 'text-[#F1F5F9]',
+              accent: 'text-[#38BDF8]',
+              card: 'bg-[#1E293B]',
+              border: 'border-[#334155]',
+              sidebar: 'bg-[#020617]',
+              button: 'bg-[#0369A1] hover:bg-[#075985] text-white',
+              widget: 'bg-[#1E293B] border border-[#38BDF8]/30 shadow-[0_0_15px_rgba(56,189,248,0.1)]'
+            };
+          case 'forest':
+            return {
+              bg: 'bg-[#064E3B]',
+              text: 'text-[#ECFDF5]',
+              accent: 'text-[#34D399]',
+              card: 'bg-[#065F46]',
+              border: 'border-[#064E3B]',
+              sidebar: 'bg-[#022C22]',
+              button: 'bg-[#059669] hover:bg-[#047857] text-white',
+              widget: 'bg-[#065F46] border border-[#34D399]/30 shadow-[0_0_15px_rgba(52,211,153,0.1)]'
+            };
+          case 'paper':
+            return {
+              bg: 'bg-[#FDF6E3]',
+              text: 'text-[#657B83]',
+              accent: 'text-[#268BD2]',
+              card: 'bg-[#EEE8D5]',
+              border: 'border-[#D3CBB1]',
+              sidebar: 'bg-[#F5EAD2]',
+              button: 'bg-[#93A1A1] hover:bg-[#586E75] text-white',
+              widget: 'bg-[#EEE8D5] border border-[#D3CBB1]'
+            };
+          case 'walnut':
+            return {
+              bg: 'bg-[#2B1B17]',
+              text: 'text-[#D7CCC8]',
+              accent: 'text-[#8D6E63]',
+              card: 'bg-[#3E2723]',
+              border: 'border-[#4E342E]',
+              sidebar: 'bg-[#1B110E]',
+              button: 'bg-[#5D4037] hover:bg-[#4E342E] text-white',
+              widget: 'bg-[#3E2723] border border-[#5D4037] shadow-lg'
+            };
+          case 'white':
+            return {
+              bg: 'bg-[#F8FAFC]',
+              text: 'text-[#0F172A]',
+              accent: 'text-[#64748B]',
+              card: 'bg-[#FFFFFF]',
+              border: 'border-[#E2E8F0]',
+              sidebar: 'bg-[#F1F5F9]',
+              button: 'bg-[#CBD5E1] hover:bg-[#94A3B8] text-[#1E293B]',
+              widget: 'bg-white border border-[#E2E8F0] shadow-sm'
+            };
+          case 'oak': default:
+            return {
+              bg: 'bg-[#FEF9EF]',
+              text: 'text-[#5C4033]',
+              accent: 'text-[#BC6C25]',
+              card: 'bg-[#F5E6CC]',
+              border: 'border-[#DDB892]',
+              sidebar: 'bg-[#E6CCB2]',
+              button: 'bg-[#B08968] hover:bg-[#7F5539] text-white',
+              widget: 'bg-[#F5E6CC] border border-[#DDB892] shadow-md'
+            };
         }
       };
 
@@ -1193,7 +1266,7 @@
                 plugins: {
                   legend: {
                     position: 'right',
-                    labels: { color: isDark ? '#E8D4BA' : '#654321' }
+                    labels: { color: themeColors.text }
                   }
                 }
               }
@@ -1207,7 +1280,7 @@
                 datasets: [{
                   label: 'Okunan Kitap',
                   data: [2, 1, 3, 4, 2, books.filter(b => b.status === 'read').length],
-                  backgroundColor: isDark ? '#B89968' : '#8B4513',
+                  backgroundColor: themeColors.button.split(' ')[0].replace('bg-[', '').replace(']', ''),
                   borderRadius: 4
                 }]
               },
@@ -1215,8 +1288,8 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                  y: { beginAtZero: true, grid: { color: isDark ? '#4A3B2F' : '#E8DCC8' }, ticks: { color: isDark ? '#B89968' : '#654321' } },
-                  x: { grid: { display: false }, ticks: { color: isDark ? '#B89968' : '#654321' } }
+                  y: { beginAtZero: true, grid: { color: themeColors.border.replace('border-[', '').replace(']', '') }, ticks: { color: themeColors.accent.replace('text-[', '').replace(']', '') } },
+                  x: { grid: { display: false }, ticks: { color: themeColors.accent.replace('text-[', '').replace(']', '') } }
                 },
                 plugins: { legend: { display: false } }
               }
@@ -1246,18 +1319,18 @@
       return (
         <div className={`min-h-screen flex transition-colors ${themeColors.bg} ${fontClasses[font]}`}>
           {/* Sidebar */}
-          <div className={`w-64 p-6 flex flex-col gap-4 border-r sticky top-0 h-screen overflow-y-auto ${themeColors.card} ${themeColors.border}`}>
+          <div className={`w-64 p-6 flex flex-col gap-4 border-r sticky top-0 h-screen overflow-y-auto ${themeColors.sidebar} ${themeColors.border}`}>
             <h2 className={`text-xl font-bold flex items-center gap-2 ${themeColors.text}`}>
               <Box size={24} /> Koleksiyonlar
             </h2>
-            <button onClick={createCollection} className={`flex items-center gap-2 p-2 rounded hover:bg-opacity-10 hover:bg-black/10 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+            <button onClick={createCollection} className={`flex items-center gap-2 p-2 rounded hover:bg-black/5 ${themeColors.text}`}>
               <Plus size={20} /> Yeni Oluştur
             </button>
 
             <div className="flex-1 space-y-2">
               <div
                 onClick={() => { setActiveCollection(null); setView('library'); }}
-                className={`p-2 rounded cursor-pointer flex items-center gap-2 ${activeCollection === null && view === 'library' ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
+                className={`p-2 rounded cursor-pointer flex items-center gap-2 ${activeCollection === null && view === 'library' ? 'bg-black/10' : ''} ${themeColors.text}`}
               >
                 <BookOpen size={20} /> Tüm Kitaplar
               </div>
@@ -1267,7 +1340,7 @@
                   onClick={() => { setActiveCollection(col.id); setView('library'); }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, col.id)}
-                  className={`p-2 rounded cursor-pointer group flex justify-between items-center ${activeCollection === col.id && view === 'library' ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
+                  className={`p-2 rounded cursor-pointer group flex justify-between items-center ${activeCollection === col.id && view === 'library' ? 'bg-black/10' : ''} ${themeColors.text}`}
                 >
                   <span className="truncate">{col.name} <span className="text-xs opacity-60">({col.bookIds.length})</span></span>
                   <Trash2 size={16} className="opacity-0 group-hover:opacity-100 hover:text-red-500" onClick={(e) => deleteCollection(col.id, e)} />
@@ -1290,17 +1363,17 @@
             {/* Header */}
             <div className="max-w-7xl mx-auto mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h1 className={`text-4xl font-bold flex items-center gap-3 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                <h1 className={`text-4xl font-bold flex items-center gap-3 ${themeColors.text}`}>
                   <BookOpen size={40} />
                   Kitaplığım
                 </h1>
 
                 <div className="flex items-center gap-4">
                   {/* Streak & Progress Widget */}
-                  <div className={`flex items-center gap-4 px-4 py-2 rounded-lg shadow-md ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <div className={`flex items-center gap-4 px-4 py-2 rounded-lg ${themeColors.widget}`}>
                     <div className="flex items-center gap-1" title={`${streakData.streak} Günlük Seri`}>
                       <Fire size={20} className={`${streakData.streak > 0 ? 'text-orange-500 fill-orange-500' : 'text-gray-400'}`} />
-                      <span className={`font-bold ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{streakData.streak}</span>
+                      <span className={`font-bold ${themeColors.text}`}>{streakData.streak}</span>
                     </div>
                     <div className="w-px h-6 bg-current opacity-20"></div>
                     <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowLogReading(true)} title="Okuma Ekle">
@@ -1320,24 +1393,21 @@
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-[10px] font-bold">{Math.round((streakData.dailyProgress.minutes / readingGoal) * 100)}%</span>
+                          <span className={`text-[10px] font-bold ${themeColors.text}`}>{Math.round((streakData.dailyProgress.minutes / readingGoal) * 100)}%</span>
                         </div>
                       </div>
                       <div className="flex flex-col">
-                        <span className={`text-xs font-bold leading-none ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                        <span className={`text-xs font-bold leading-none ${themeColors.text}`}>
                           {streakData.dailyProgress.minutes} / {readingGoal} dk
                         </span>
-                        <span className="text-[10px] opacity-70">Bugünkü Hedef</span>
+                        <span className={`text-[10px] opacity-70 ${themeColors.text}`}>Bugünkü Hedef</span>
                       </div>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setIs3DMode(!is3DMode)}
-                    className={`p-3 rounded-full transition-all flex items-center gap-2 ${isDark
-                      ? 'bg-[#382E26] text-[#E8D4BA] hover:bg-[#4A3B2F]'
-                      : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
-                      }`}
+                    className={`p-3 rounded-full transition-all flex items-center gap-2 shadow-lg ${themeColors.button}`}
                     title={is3DMode ? '2D Görünüme Geç' : '3D Görünüme Geç'}
                   >
                     {is3DMode ? <Box size={24} /> : <LayoutGrid size={24} />}
@@ -1412,7 +1482,7 @@
                     <div className="flex flex-col md:flex-row gap-4">
                       {/* Search */}
                       <div className="flex-1 relative">
-                        <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#8B4513]'}`} size={20} />
+                        <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${themeColors.accent}`} size={20} />
                         <input
                           type="text"
                           value={searchQuery}
@@ -1487,7 +1557,7 @@
                           // SEARCH RESULTS VIEW (SINGLE GRID)
                           <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''}`}>
                             {filteredBooks.length === 0 ? (
-                              <div className={`col-span-full text-center py-10 opacity-70 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                              <div className={`col-span-full text-center py-10 opacity-70 ${themeColors.text}`}>
                                 <p className="text-xl italic">Aramanızla eşleşen kitap bulunamadı.</p>
                               </div>
                             ) : (
@@ -1617,34 +1687,34 @@
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
 
                   {/* Summary Cards */}
-                  <div className={`p-6 rounded-lg shadow-lg ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                    <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-[#B89968]' : 'text-[#654321]'}`}>Toplam Kitap</h3>
+                  <div className={`p-6 rounded-lg shadow-lg ${themeColors.card} ${themeColors.border} border`}>
+                    <h3 className={`text-lg font-semibold mb-2 ${themeColors.accent}`}>Toplam Kitap</h3>
                     <div className="flex justify-between items-end">
-                      <p className={`text-4xl font-bold ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.total}</p>
+                      <p className={`text-4xl font-bold ${themeColors.text}`}>{stats.total}</p>
                       <Book size={32} className="opacity-20" />
                     </div>
                   </div>
 
-                  <div className={`p-6 rounded-lg shadow-lg ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                    <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-[#B89968]' : 'text-[#654321]'}`}>Toplam Sayfa</h3>
+                  <div className={`p-6 rounded-lg shadow-lg ${themeColors.card} ${themeColors.border} border`}>
+                    <h3 className={`text-lg font-semibold mb-2 ${themeColors.accent}`}>Toplam Sayfa</h3>
                     <div className="flex justify-between items-end">
-                      <p className={`text-4xl font-bold ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.totalPages}</p>
+                      <p className={`text-4xl font-bold ${themeColors.text}`}>{stats.totalPages}</p>
                       <FileText size={32} className="opacity-20" />
                     </div>
                   </div>
 
-                  <div className={`p-6 rounded-lg shadow-lg ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                    <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-[#B89968]' : 'text-[#654321]'}`}>En Uzun Seri</h3>
+                  <div className={`p-6 rounded-lg shadow-lg ${themeColors.card} ${themeColors.border} border`}>
+                    <h3 className={`text-lg font-semibold mb-2 ${themeColors.accent}`}>En Uzun Seri</h3>
                     <div className="flex justify-between items-end">
-                      <p className={`text-4xl font-bold ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{streakData.longestStreak || streakData.streak} <span className="text-lg font-normal">gün</span></p>
+                      <p className={`text-4xl font-bold ${themeColors.text}`}>{streakData.longestStreak || streakData.streak} <span className="text-lg font-normal">gün</span></p>
                       <Fire size={32} className="opacity-20 text-orange-500" />
                     </div>
                   </div>
 
-                  <div className={`p-6 rounded-lg shadow-lg ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                    <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-[#B89968]' : 'text-[#654321]'}`}>Ort. Puan</h3>
+                  <div className={`p-6 rounded-lg shadow-lg ${themeColors.card} ${themeColors.border} border`}>
+                    <h3 className={`text-lg font-semibold mb-2 ${themeColors.accent}`}>Ort. Puan</h3>
                     <div className="flex justify-between items-end">
-                      <p className={`text-4xl font-bold flex items-center gap-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                      <p className={`text-4xl font-bold flex items-center gap-2 ${themeColors.text}`}>
                         {stats.avgRating}
                       </p>
                       <Star size={32} fill="#FFD700" stroke="#FFD700" />
@@ -1948,24 +2018,23 @@
                     <h3 className={`text-xl font-semibold mb-4 flex items-center gap-2 ${themeColors.text}`}>
                       <LayoutGrid size={24} /> Tema Seçimi
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {['oak', 'walnut', 'white', 'dark'].map(t => (
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                      {[
+                        { id: 'oak', name: 'Meşe', color: '#E6CCB2' },
+                        { id: 'walnut', name: 'Ceviz', color: '#3E2723' },
+                        { id: 'white', name: 'Beyaz', color: '#FFFFFF' },
+                        { id: 'dark', name: 'Karanlık', color: '#1A1A1A' },
+                        { id: 'midnight', name: 'Gece Yarısı', color: '#020617' },
+                        { id: 'forest', name: 'Orman', color: '#022C22' },
+                        { id: 'paper', name: 'Kağıt', color: '#F5EAD2' }
+                      ].map(t => (
                         <div
-                          key={t}
-                          onClick={() => setTheme(t)}
-                          className={`cursor-pointer border-4 rounded-lg p-4 flex flex-col items-center gap-2 transition-all ${theme === t ? 'border-[#7B3F3F]' : 'border-transparent'} ${t === 'oak' ? 'bg-[#E8DCC8] text-[#654321]' :
-                            t === 'walnut' ? 'bg-[#3E2723] text-[#D7CCC8]' :
-                              t === 'white' ? 'bg-[#F5F5F5] text-[#212121]' :
-                                'bg-[#26201B] text-[#E8D4BA]'
-                            }`}
+                          key={t.id}
+                          onClick={() => setTheme(t.id)}
+                          className={`cursor-pointer border-2 rounded-lg p-3 flex flex-col items-center gap-2 transition-all hover:scale-105 ${theme === t.id ? 'border-orange-500 shadow-md ring-2 ring-orange-500/20' : 'border-transparent hover:bg-black/5'} ${themeColors.card}`}
                         >
-                          <div className="w-full h-24 rounded bg-current opacity-20"></div>
-                          <span className="font-bold capitalize">{
-                            t === 'oak' ? 'Meşe (Klasik)' :
-                              t === 'walnut' ? 'Ceviz (Koyu)' :
-                                t === 'white' ? 'Modern (Beyaz)' :
-                                  'Gece Modu'
-                          }</span>
+                          <div className={`w-10 h-10 rounded-full border shadow-inner`} style={{ backgroundColor: t.color }}></div>
+                          <span className={`text-xs font-bold leading-tight text-center ${themeColors.text}`}>{t.name}</span>
                         </div>
                       ))}
                     </div>
