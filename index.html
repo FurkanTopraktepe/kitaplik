@@ -131,6 +131,216 @@
       </svg>
     );
 
+    const BookSpine = ({ book, onClick }) => (
+      <div
+        onClick={onClick}
+        className="relative cursor-pointer transition-all hover:translate-y-[-8px] hover:shadow-xl"
+        style={{
+          width: '60px',
+          height: '280px',
+          backgroundColor: book.cover,
+          borderRadius: '0 4px 4px 0',
+          boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), 2px 2px 8px rgba(0,0,0,0.15)',
+          border: '2px solid rgba(107, 68, 35, 0.3)',
+          borderLeft: '6px solid rgba(107, 68, 35, 0.5)'
+        }}
+      >
+        <div className="absolute inset-0 flex items-center justify-center" style={{ writingMode: 'vertical-rl' }}>
+          <span className="text-xs font-semibold text-white px-2 text-center" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+            {book.title}
+          </span>
+        </div>
+        {book.totalPages > 0 && book.currentPage > 0 && book.status === 'reading' && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+            <div
+              className="h-full bg-green-500"
+              style={{ width: `${Math.min((book.currentPage / book.totalPages) * 100, 100)}%` }}
+            />
+          </div>
+        )}
+        {book.rating > 0 && (
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-0.5">
+            <Star size={10} fill="#FFD700" stroke="#FFD700" />
+            <span className="text-[10px] text-white font-bold">{book.rating}</span>
+          </div>
+        )}
+      </div>
+    );
+
+    const BookDetail = ({ book, onClose, onUpdate, onDelete, darkMode }) => {
+      const [newHighlight, setNewHighlight] = useState('');
+
+      const addHighlight = () => {
+        if (newHighlight.trim()) {
+          onUpdate(book.id, { highlights: [...book.highlights, newHighlight] });
+          setNewHighlight('');
+        }
+      };
+
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative shadow-2xl ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+            <button
+              onClick={onClose}
+              className={`absolute top-4 right-4 ${darkMode ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
+            >
+              <X size={24} />
+            </button>
+
+            <div className="flex gap-6 mb-6">
+              <div
+                className="w-32 h-48 rounded shadow-lg flex-shrink-0"
+                style={{
+                  backgroundColor: book.cover,
+                  boxShadow: '4px 4px 12px rgba(0,0,0,0.3)'
+                }}
+              />
+
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className={`text-3xl font-bold mb-1 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{book.title}</h2>
+                    <p className={`text-lg mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#8B4513]'}`}>{book.author}</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${darkMode ? 'bg-[#4A3B2F] text-[#B89968]' : 'bg-[#C8A882] text-[#654321]'}`}>
+                      {book.genre || 'Tür Belirtilmemiş'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => onDelete(book.id)}
+                    className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors"
+                    title="Kitabı Sil"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+
+                <div className="mb-4 text-xs font-semibold">
+                  {book.totalPages > 0 && (
+                    <div className={`p-2 rounded flex items-center gap-2 mb-2 ${darkMode ? 'bg-[#2D2620] text-[#B89968]' : 'bg-[#E8DCC8] text-[#654321]'}`}>
+                      <div className="flex-1">
+                        <div className="flex justify-between mb-1">
+                          <span>İlerleme: Sayfa {book.currentPage || 0} / {book.totalPages}</span>
+                          <span>{Math.round(((book.currentPage || 0) / book.totalPages) * 100)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-[#7B3F3F] h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${Math.min(((book.currentPage || 0) / book.totalPages) * 100, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1">
+                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
+                    <select
+                      value={book.status}
+                      onChange={(e) => onUpdate(book.id, { status: e.target.value })}
+                      className={`w-full p-2 border-2 rounded ${darkMode
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                        }`}
+                    >
+                      <option value="want-to-read">Okunacak</option>
+                      <option value="reading">Okunuyor</option>
+                      <option value="read">Okundu</option>
+                    </select>
+                  </div>
+
+                  <div className="flex-1">
+                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Şu Anki Sayfa</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={book.currentPage || ''}
+                        onChange={(e) => onUpdate(book.id, { currentPage: Number(e.target.value) })}
+                        placeholder={book.totalPages ? `/ ${book.totalPages}` : '0'}
+                        className={`w-full p-2 border-2 rounded ${darkMode
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                          }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Puanım</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star
+                        key={star}
+                        size={28}
+                        className="cursor-pointer transition-all"
+                        fill={star <= book.rating ? '#FFD700' : 'none'}
+                        stroke={star <= book.rating ? '#FFD700' : '#D2B48C'}
+                        onClick={() => onUpdate(book.id, { rating: star })}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>İncelemem</label>
+              <textarea
+                value={book.review}
+                onChange={(e) => onUpdate(book.id, { review: e.target.value })}
+                className={`w-full p-3 border-2 rounded min-h-[100px] ${darkMode
+                  ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                  : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                  }`}
+                placeholder="Bu kitap hakkında düşüncelerini yaz..."
+              />
+            </div>
+
+            <div>
+              <label className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                <Quote size={18} />
+                Altını Çizdiklerim
+              </label>
+
+              <div className="space-y-3 mb-3">
+                {book.highlights.map((highlight, idx) => (
+                  <div key={idx} className={`p-3 rounded border-l-4 border-[#7B3F3F] shadow-sm ${darkMode ? 'bg-[#2D2620]' : 'bg-[#E8DCC8]'}`}>
+                    <p className={`italic ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>"{highlight}"</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newHighlight}
+                  onChange={(e) => setNewHighlight(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      addHighlight();
+                    }
+                  }}
+                  className={`flex-1 p-2 border-2 rounded ${darkMode
+                    ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                    : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                    }`}
+                  placeholder="Yeni alıntı ekle..."
+                />
+                <button
+                  onClick={addHighlight}
+                  className="px-4 py-2 bg-[#7B3F3F] text-white rounded hover:bg-[#5D3030] transition-colors"
+                >
+                  Ekle
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     const BookshelfApp = () => {
       const [view, setView] = useState('library');
 
@@ -152,6 +362,11 @@
       const [annualGoal, setAnnualGoal] = useState(() => {
         const saved = localStorage.getItem('bookshelf_annualGoal');
         return saved ? JSON.parse(saved) : 20; // 20 books default
+      });
+
+      const [challengeName, setChallengeName] = useState(() => {
+        const saved = localStorage.getItem('bookshelf_challengeName');
+        return saved ? JSON.parse(saved) : `${new Date().getFullYear()} Okuma Hedefi`;
       });
 
       const [streakData, setStreakData] = useState(() => {
@@ -256,6 +471,11 @@
       useEffect(() => {
         localStorage.setItem('bookshelf_annualGoal', JSON.stringify(annualGoal));
       }, [annualGoal]);
+
+      // Save challenge name
+      useEffect(() => {
+        localStorage.setItem('bookshelf_challengeName', JSON.stringify(challengeName));
+      }, [challengeName]);
 
       // Save streak data
       useEffect(() => {
@@ -418,215 +638,10 @@
           : 0
       };
 
-      const BookSpine = ({ book, onClick }) => (
-        <div
-          onClick={onClick}
-          className="relative cursor-pointer transition-all hover:translate-y-[-8px] hover:shadow-xl"
-          style={{
-            width: '60px',
-            height: '280px',
-            backgroundColor: book.cover,
-            borderRadius: '0 4px 4px 0',
-            boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), 2px 2px 8px rgba(0,0,0,0.15)',
-            border: '2px solid rgba(107, 68, 35, 0.3)',
-            borderLeft: '6px solid rgba(107, 68, 35, 0.5)'
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center" style={{ writingMode: 'vertical-rl' }}>
-            <span className="text-xs font-semibold text-white px-2 text-center" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-              {book.title}
-            </span>
-          </div>
-          {book.totalPages > 0 && book.currentPage > 0 && book.status === 'reading' && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-              <div
-                className="h-full bg-green-500"
-                style={{ width: `${Math.min((book.currentPage / book.totalPages) * 100, 100)}%` }}
-              />
-            </div>
-          )}
-          {book.rating > 0 && (
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-0.5">
-              <Star size={10} fill="#FFD700" stroke="#FFD700" />
-              <span className="text-[10px] text-white font-bold">{book.rating}</span>
-            </div>
-          )}
-        </div>
-      );
 
-      const BookDetail = ({ book }) => {
-        const [newHighlight, setNewHighlight] = useState('');
-
-        return (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative shadow-2xl ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
-              <button
-                onClick={() => setSelectedBook(null)}
-                className={`absolute top-4 right-4 ${darkMode ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
-              >
-                <X size={24} />
-              </button>
-
-              <div className="flex gap-6 mb-6">
-                <div
-                  className="w-32 h-48 rounded shadow-lg flex-shrink-0"
-                  style={{
-                    backgroundColor: book.cover,
-                    boxShadow: '4px 4px 12px rgba(0,0,0,0.3)'
-                  }}
-                />
-
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h2 className={`text-3xl font-bold mb-1 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{book.title}</h2>
-                      <p className={`text-lg mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#8B4513]'}`}>{book.author}</p>
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${darkMode ? 'bg-[#3D3429] text-[#B89968]' : 'bg-[#C8A882] text-[#654321]'}`}>
-                        {book.genre || 'Tür Belirtilmemiş'}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => deleteBook(book.id)}
-                      className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors"
-                      title="Kitabı Sil"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-
-                  <div className="mb-4 text-xs font-semibold">
-                    {book.totalPages > 0 && (
-                      <div className={`p-2 rounded flex items-center gap-2 mb-2 ${darkMode ? 'bg-[#1A1410] text-[#B89968]' : 'bg-[#E8DCC8] text-[#654321]'}`}>
-                        <div className="flex-1">
-                          <div className="flex justify-between mb-1">
-                            <span>İlerleme: Sayfa {book.currentPage || 0} / {book.totalPages}</span>
-                            <span>{Math.round(((book.currentPage || 0) / book.totalPages) * 100)}%</span>
-                          </div>
-                          <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
-                            <div
-                              className="bg-[#7B3F3F] h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${Math.min(((book.currentPage || 0) / book.totalPages) * 100, 100)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-4 mb-4">
-                    <div className="flex-1">
-                      <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
-                      <select
-                        value={book.status}
-                        onChange={(e) => updateBook(book.id, { status: e.target.value })}
-                        className={`w-full p-2 border-2 rounded ${darkMode
-                          ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      >
-                        <option value="want-to-read">Okunacak</option>
-                        <option value="reading">Okunuyor</option>
-                        <option value="read">Okundu</option>
-                      </select>
-                    </div>
-
-                    <div className="flex-1">
-                      <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Şu Anki Sayfa</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={book.currentPage || ''}
-                          onChange={(e) => updateBook(book.id, { currentPage: Number(e.target.value) })}
-                          placeholder={book.totalPages ? `/ ${book.totalPages}` : '0'}
-                          className={`w-full p-2 border-2 rounded ${darkMode
-                            ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
-                            : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                            }`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Puanım</label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <Star
-                          key={star}
-                          size={28}
-                          className="cursor-pointer transition-all"
-                          fill={star <= book.rating ? '#FFD700' : 'none'}
-                          stroke={star <= book.rating ? '#FFD700' : '#D2B48C'}
-                          onClick={() => updateBook(book.id, { rating: star })}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>İncelemem</label>
-                <textarea
-                  value={book.review}
-                  onChange={(e) => updateBook(book.id, { review: e.target.value })}
-                  className={`w-full p-3 border-2 rounded min-h-[100px] ${darkMode
-                    ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
-                    : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                    }`}
-                  placeholder="Bu kitap hakkında düşüncelerini yaz..."
-                />
-              </div>
-
-              <div>
-                <label className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
-                  <Quote size={18} />
-                  Altını Çizdiklerim
-                </label>
-
-                <div className="space-y-3 mb-3">
-                  {book.highlights.map((highlight, idx) => (
-                    <div key={idx} className={`p-3 rounded border-l-4 border-[#7B3F3F] shadow-sm ${darkMode ? 'bg-[#1A1410]' : 'bg-[#E8DCC8]'}`}>
-                      <p className={`italic ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>"{highlight}"</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newHighlight}
-                    onChange={(e) => setNewHighlight(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        addHighlight(book.id, newHighlight);
-                        setNewHighlight('');
-                      }
-                    }}
-                    className={`flex-1 p-2 border-2 rounded ${darkMode
-                      ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
-                      : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                      }`}
-                    placeholder="Yeni alıntı ekle..."
-                  />
-                  <button
-                    onClick={() => {
-                      addHighlight(book.id, newHighlight);
-                      setNewHighlight('');
-                    }}
-                    className="px-4 py-2 bg-[#7B3F3F] text-white rounded hover:bg-[#5D3030] transition-colors"
-                  >
-                    Ekle
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      };
 
       return (
-        <div className={`min-h-screen p-8 transition-colors ${darkMode ? 'bg-[#0F0E0D]' : 'bg-[#E8DCC8]'}`}>
+        <div className={`min-h-screen p-8 transition-colors ${darkMode ? 'bg-[#26201B]' : 'bg-[#E8DCC8]'}`}>
           {/* Header */}
           <div className="max-w-7xl mx-auto mb-8">
             <div className="flex items-center justify-between mb-6">
@@ -637,7 +652,7 @@
 
               <div className="flex items-center gap-4">
                 {/* Streak & Progress Widget */}
-                <div className={`flex items-center gap-4 px-4 py-2 rounded-lg shadow-md ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`flex items-center gap-4 px-4 py-2 rounded-lg shadow-md ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <div className="flex items-center gap-1" title={`${streakData.streak} Günlük Seri`}>
                     <Fire size={20} className={`${streakData.streak > 0 ? 'text-orange-500 fill-orange-500' : 'text-gray-400'}`} />
                     <span className={`font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{streakData.streak}</span>
@@ -675,7 +690,7 @@
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className={`p-3 rounded-full transition-all ${darkMode
-                    ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
+                    ? 'bg-[#382E26] text-[#E8D4BA] hover:bg-[#4A3B2F]'
                     : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
                     }`}
                   title={darkMode ? 'Gündüz Modu' : 'Gece Modu'}
@@ -694,7 +709,7 @@
                     ? 'bg-[#7B3F3F] text-[#F5E6D3] shadow-lg'
                     : 'bg-[#6B4423] text-[#F5E6D3] shadow-lg'
                   : darkMode
-                    ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
+                    ? 'bg-[#382E26] text-[#E8D4BA] hover:bg-[#4A3B2F]'
                     : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
                   }`}
               >
@@ -707,7 +722,7 @@
                     ? 'bg-[#7B3F3F] text-[#F5E6D3] shadow-lg'
                     : 'bg-[#6B4423] text-[#F5E6D3] shadow-lg'
                   : darkMode
-                    ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
+                    ? 'bg-[#382E26] text-[#E8D4BA] hover:bg-[#4A3B2F]'
                     : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
                   }`}
               >
@@ -721,7 +736,7 @@
                     ? 'bg-[#7B3F3F] text-[#F5E6D3] shadow-lg'
                     : 'bg-[#6B4423] text-[#F5E6D3] shadow-lg'
                   : darkMode
-                    ? 'bg-[#2D2419] text-[#E8D4BA] hover:bg-[#3D3429]'
+                    ? 'bg-[#382E26] text-[#E8D4BA] hover:bg-[#4A3B2F]'
                     : 'bg-[#D4B896] text-[#654321] hover:bg-[#C8A882]'
                   }`}
               >
@@ -757,7 +772,7 @@
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Kitap ara..."
                       className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg transition-colors ${darkMode
-                        ? 'bg-[#2D2419] border-[#3D3429] text-[#E8D4BA] placeholder-[#A08060]'
+                        ? 'bg-[#382E26] border-[#4A3B2F] text-[#E8D4BA] placeholder-[#A08060]'
                         : 'bg-[#D4B896] border-[#C8A882] text-[#654321] placeholder-[#8B6F47]'
                         }`}
                     />
@@ -781,7 +796,7 @@
                         className="p-6 rounded-lg relative"
                         style={{
                           background: darkMode
-                            ? 'linear-gradient(to bottom, #3D3429 0%, #2D2419 100%)'
+                            ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
                             : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
                           boxShadow: darkMode
                             ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
@@ -801,19 +816,19 @@
             )}
 
             {view === 'highlights' && (
-              <div className={`p-8 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+              <div className={`p-8 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                 <h2 className={`text-3xl font-bold mb-6 flex items-center gap-3 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
                   <Quote size={32} />
                   Tüm Alıntılarım
                 </h2>
                 <div className="space-y-6">
                   {books.filter(b => b.highlights.length > 0).map(book => (
-                    <div key={book.id} className={`border-b-2 pb-6 last:border-b-0 ${darkMode ? 'border-[#3D3429]' : 'border-[#C8A882]'}`}>
+                    <div key={book.id} className={`border-b-2 pb-6 last:border-b-0 ${darkMode ? 'border-[#4A3B2F]' : 'border-[#C8A882]'}`}>
                       <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{book.title}</h3>
                       <p className={`text-sm mb-3 ${darkMode ? 'text-[#B89968]' : 'text-[#8B6F47]'}`}>{book.author}</p>
                       <div className="space-y-3">
                         {book.highlights.map((highlight, idx) => (
-                          <div key={idx} className={`p-4 rounded border-l-4 border-[#7B3F3F] shadow-sm ${darkMode ? 'bg-[#1A1410]' : 'bg-[#E8DCC8]'}`}>
+                          <div key={idx} className={`p-4 rounded border-l-4 border-[#7B3F3F] shadow-sm ${darkMode ? 'bg-[#2D2620]' : 'bg-[#E8DCC8]'}`}>
                             <p className={`italic ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>"{highlight}"</p>
                           </div>
                         ))}
@@ -829,19 +844,19 @@
 
             {view === 'stats' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Toplam Kitap</h3>
                   <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.total}</p>
                 </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Okunan</h3>
                   <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.read}</p>
                 </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Okunuyor</h3>
                   <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.reading}</p>
                 </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Ort. Puan</h3>
                   <p className={`text-4xl font-bold flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
                     {stats.avgRating}
@@ -849,7 +864,7 @@
                   </p>
                 </div>
 
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Günlük Hedef</h3>
                   <div className="flex items-center gap-2">
                     <input
@@ -857,7 +872,7 @@
                       value={readingGoal}
                       onChange={(e) => setReadingGoal(Number(e.target.value))}
                       className={`w-20 p-2 border-2 rounded text-xl font-bold ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     />
@@ -865,11 +880,16 @@
                   </div>
                 </div>
 
-                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
-                  <h3 className={`text-lg font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>
-                    <Award size={24} />
-                    {new Date().getFullYear()} Okuma Hedefi (Challenge)
-                  </h3>
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Award size={24} className={`${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`} />
+                    <input
+                      type="text"
+                      value={challengeName}
+                      onChange={(e) => setChallengeName(e.target.value)}
+                      className={`text-lg font-semibold bg-transparent border-b-2 border-transparent hover:border-current focus:border-current outline-none w-full transition-all ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}
+                    />
+                  </div>
                   <div className="flex items-center gap-4 mb-2">
                     <div className="flex-1 h-4 bg-gray-300 rounded-full overflow-hidden">
                       <div
@@ -888,7 +908,7 @@
                         value={annualGoal}
                         onChange={(e) => setAnnualGoal(Number(e.target.value))}
                         className={`w-16 p-1 text-center border rounded font-bold ${darkMode
-                          ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                           : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                           }`}
                       />
@@ -896,13 +916,13 @@
                   </div>
                 </div>
 
-                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Veri Yönetimi</h3>
                   <div className="flex flex-wrap gap-4">
                     <button
                       onClick={exportData}
                       className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors ${darkMode
-                        ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                        ? 'bg-[#4A3B2F] text-[#E8D4BA] hover:bg-[#4D4439]'
                         : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                         }`}
                     >
@@ -911,7 +931,7 @@
                     </button>
 
                     <label className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors cursor-pointer ${darkMode
-                      ? 'bg-[#3D3429] text-[#E8D4BA] hover:bg-[#4D4439]'
+                      ? 'bg-[#4A3B2F] text-[#E8D4BA] hover:bg-[#4D4439]'
                       : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                       }`}>
                       <Upload size={20} />
@@ -932,7 +952,7 @@
           {/* Add Book Modal */}
           {showAddBook && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className={`rounded-lg max-w-md w-full p-8 relative shadow-2xl ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+              <div className={`rounded-lg max-w-md w-full p-8 relative shadow-2xl ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                 <button
                   onClick={() => setShowAddBook(false)}
                   className={`absolute top-4 right-4 ${darkMode ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
@@ -950,7 +970,7 @@
                       value={newBook.title}
                       onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
                       className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     />
@@ -963,7 +983,7 @@
                       value={newBook.author}
                       onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
                       className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     />
@@ -977,7 +997,7 @@
                       onChange={(e) => setNewBook({ ...newBook, totalPages: Number(e.target.value) })}
                       placeholder="Örn: 350"
                       className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     />
@@ -989,7 +1009,7 @@
                       value={newBook.genre}
                       onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
                       className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     >
@@ -1019,7 +1039,7 @@
                       value={newBook.status}
                       onChange={(e) => setNewBook({ ...newBook, status: e.target.value })}
                       className={`w-full p-2 border-2 rounded ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                     >
@@ -1043,7 +1063,7 @@
           {/* Log Reading Modal */}
           {showLogReading && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className={`rounded-lg max-w-sm w-full p-8 relative shadow-2xl ${darkMode ? 'bg-[#2D2419]' : 'bg-[#D4B896]'}`}>
+              <div className={`rounded-lg max-w-sm w-full p-8 relative shadow-2xl ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                 <button
                   onClick={() => setShowLogReading(false)}
                   className={`absolute top-4 right-4 ${darkMode ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
@@ -1066,7 +1086,7 @@
                       placeholder="Örn: 30"
                       autoFocus
                       className={`w-full p-3 border-2 rounded-lg text-lg ${darkMode
-                        ? 'border-[#3D3429] bg-[#1A1410] text-[#E8D4BA]'
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                         : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                         }`}
                       onKeyPress={(e) => e.key === 'Enter' && logReadingTime()}
@@ -1085,7 +1105,15 @@
           )}
 
           {/* Book Detail Modal */}
-          {selectedBook && <BookDetail book={selectedBook} />}
+          {selectedBook && (
+            <BookDetail
+              book={selectedBook}
+              onClose={() => setSelectedBook(null)}
+              onUpdate={updateBook}
+              onDelete={deleteBook}
+              darkMode={darkMode}
+            />
+          )}
         </div>
       );
     };
