@@ -428,8 +428,14 @@
                       {book.genre || 'Tür Belirtilmemiş'}
                     </span>
                   </div>
+                  <button
+                    onClick={() => onDelete(book.id)}
+                    className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors"
+                    title="Kitabı Sil"
+                  >
+                    <Trash2 size={20} />
+                  </button>
                 </div>
-
 
                 <div className="mb-4 text-xs font-semibold">
                   {book.totalPages > 0 && (
@@ -524,14 +530,6 @@
                         onClick={() => onUpdate(book.id, { rating: star })}
                       />
                     ))}
-
-                    <button
-                      onClick={() => onDelete(book.id)}
-                      className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors ml-auto"
-                      title="Kitabı Sil"
-                    >
-                      <Trash2 size={20} />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -588,8 +586,8 @@
                 </button>
               </div>
             </div>
-          </div >
-        </div >
+          </div>
+        </div>
       );
     };
 
@@ -748,34 +746,6 @@
       const [selectedBook, setSelectedBook] = useState(null);
       const [showAddBook, setShowAddBook] = useState(false);
       const [showLogReading, setShowLogReading] = useState(false);
-
-      // Search & Filter State
-      const [searchQuery, setSearchQuery] = useState('');
-      const [filterStatus, setFilterStatus] = useState('all');
-      const [filterGenre, setFilterGenre] = useState('all');
-      const [sortBy, setSortBy] = useState('date-desc'); // date-desc, date-asc, rating-desc, rating-asc, title-asc, title-desc, pages-desc, pages-asc
-
-      // Filter and Sort Logic
-      const filteredBooks = books.filter(book => {
-        const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = filterStatus === 'all' || book.status === filterStatus;
-        const matchesGenre = filterGenre === 'all' || book.genre === filterGenre;
-
-        return matchesSearch && matchesStatus && matchesGenre;
-      }).sort((a, b) => {
-        switch (sortBy) {
-          case 'date-desc': return b.id - a.id; // Assuming higher ID is newer
-          case 'date-asc': return a.id - b.id;
-          case 'rating-desc': return b.rating - a.rating;
-          case 'rating-asc': return a.rating - b.rating;
-          case 'title-asc': return a.title.localeCompare(b.title);
-          case 'title-desc': return b.title.localeCompare(a.title);
-          case 'pages-desc': return b.totalPages - a.totalPages;
-          case 'pages-asc': return a.totalPages - b.totalPages;
-          default: return 0;
-        }
-      });
       const [logMinutes, setLogMinutes] = useState('');
       const [newBook, setNewBook] = useState({
         title: '',
@@ -790,7 +760,7 @@
         totalPages: '',
         currentPage: 0
       });
-
+      const [searchQuery, setSearchQuery] = useState('');
 
       const statusLabels = {
         'want-to-read': 'Okunacak',
@@ -1067,182 +1037,98 @@
           <div className="max-w-7xl mx-auto">
             {view === 'library' && (
               <div>
-                {/* Search & Filter Toolbar */}
-                <div className={`mb-6 p-4 rounded-lg shadow-md ${darkMode ? 'bg-[#382E26]' : 'bg-[#E8DCC8]'}`}>
-                  <div className="flex flex-col md:flex-row gap-4">
-                    {/* Search */}
-                    <div className="flex-1 relative">
-                      <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#8B4513]'}`} size={20} />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Kitap veya yazar ara..."
-                        className={`w-full pl-10 pr-4 py-2 border-2 rounded ${darkMode
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA] placeholer-[#6B5A4A]'
-                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321] placeholder-[#A0856A]'
-                          }`}
-                      />
-                    </div>
-
-                    {/* Filters & Sort */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-                      {/* Status Filter */}
-                      <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                        className={`p-2 border-2 rounded ${darkMode
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
-                          }`}
-                      >
-                        <option value="all">Tüm Durumlar</option>
-                        <option value="reading">Okunuyor</option>
-                        <option value="want-to-read">Okunacak</option>
-                        <option value="read">Okundu</option>
-                      </select>
-
-                      {/* Genre Filter */}
-                      <select
-                        value={filterGenre}
-                        onChange={(e) => setFilterGenre(e.target.value)}
-                        className={`p-2 border-2 rounded ${darkMode
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
-                          }`}
-                      >
-                        <option value="all">Tüm Türler</option>
-                        {genres.map(g => <option key={g} value={g}>{g}</option>)}
-                      </select>
-
-                      {/* Sort */}
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className={`p-2 border-2 rounded ${darkMode
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
-                          }`}
-                      >
-                        <option value="date-desc">En Yeni</option>
-                        <option value="date-asc">En Eski</option>
-                        <option value="rating-desc">Puan (Yüksek)</option>
-                        <option value="rating-asc">Puan (Düşük)</option>
-                        <option value="pages-desc">Sayfa (Çok)</option>
-                        <option value="pages-asc">Sayfa (Az)</option>
-                        <option value="title-asc">A-Z</option>
-                        <option value="title-desc">Z-A</option>
-                      </select>
-                    </div>
+                {/* Search */}
+                <div className="mb-6">
+                  <div className="relative">
+                    <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#8B4513]'}`} size={20} />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Kitap ara..."
+                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg transition-colors ${darkMode
+                        ? 'bg-[#382E26] border-[#4A3B2F] text-[#E8D4BA] placeholder-[#A08060]'
+                        : 'bg-[#D4B896] border-[#C8A882] text-[#654321] placeholder-[#8B6F47]'
+                        }`}
+                    />
                   </div>
                 </div>
 
-                {/* Is Filtering or Searching? */}
-                {(() => {
-                  const isFiltering = searchQuery !== '' || filterStatus !== 'all' || filterGenre !== 'all' || sortBy !== 'date-desc';
+                {/* Bookshelf */}
+                {['read', 'reading', 'want-to-read'].map(status => {
+                  const filteredBooks = books.filter(b =>
+                    b.status === status &&
+                    (b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      b.author.toLowerCase().includes(searchQuery.toLowerCase()))
+                  );
+
+                  if (filteredBooks.length === 0) return null;
 
                   return (
-                    <div>
-                      {isFiltering ? (
-                        // SEARCH RESULTS VIEW (SINGLE GRID)
-                        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''}`}>
-                          {filteredBooks.length === 0 ? (
-                            <div className={`col-span-full text-center py-10 opacity-70 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
-                              <p className="text-xl italic">Aramanızla eşleşen kitap bulunamadı.</p>
-                            </div>
-                          ) : (
-                            filteredBooks.map(book => (
-                              <BookSpine
-                                key={book.id}
-                                book={book}
-                                onClick={() => setSelectedBook(book)}
-                                is3D={is3DMode}
-                              />
-                            ))
-                          )}
+                    <div key={status} className="mb-12">
+                      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{statusLabels[status]}</h2>
+
+                      {/* The Cabinet/Shelf Container */}
+                      <div
+                        className={`transition-all duration-300 relative ${is3DMode ? 'p-8' : 'p-6 rounded-lg'}`}
+                        style={is3DMode ? {
+                          /* 3D MODE: VINTAGE CABINET STYLE */
+                          backgroundColor: darkMode ? '#1e140e' : '#f0e6d2',
+                          backgroundImage: darkMode
+                            ? 'radial-gradient(circle at 50% 50%, #3a2e26 0%, #1a120b 90%)'
+                            : 'radial-gradient(circle at 50% 50%, #e8dcc8 0%, #c8aa81 90%)',
+                          boxShadow: darkMode
+                            ? 'inset 0 0 60px rgba(0,0,0,0.95), 0 20px 40px rgba(0,0,0,0.6)'
+                            : 'inset 0 0 40px rgba(139,69,19,0.2), 0 10px 20px rgba(0,0,0,0.1)',
+                          borderStyle: 'solid',
+                          borderWidth: '16px',
+                          borderTopColor: darkMode ? '#3e2b20' : '#e6c8a0',
+                          borderLeftColor: darkMode ? '#322219' : '#deb887',
+                          borderRightColor: darkMode ? '#261a12' : '#d2b48c',
+                          borderBottomColor: darkMode ? '#1e140d' : '#c8aa81',
+                          borderBottomWidth: '24px',
+                          borderRadius: '4px',
+                          minHeight: '340px',
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          overflow: 'hidden'
+                        } : {
+                          /* 2D MODE: FLAT SIMPLE STYLE */
+                          background: darkMode
+                            ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
+                            : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
+                          boxShadow: darkMode
+                            ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
+                            : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
+                        }}
+                      >
+                        {is3DMode && (
+                          <>
+                            {/* Inner corner shadows for extra depth */}
+                            <div className="absolute inset-0 pointer-events-none" style={{
+                              boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
+                            }}></div>
+
+                            {/* Shelf Shadow/Plank definition */}
+                            <div
+                              className="absolute bottom-0 left-0 right-0 h-4 pointer-events-none"
+                              style={{
+                                background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))',
+                                zIndex: 0
+                              }}
+                            ></div>
+                          </>
+                        )}
+
+                        <div className={`flex gap-2 items-end flex-wrap w-full relative z-10 ${is3DMode ? 'pl-4' : ''}`}>
+                          {filteredBooks.map(book => (
+                            <BookSpine key={book.id} book={book} is3D={is3DMode} onClick={() => setSelectedBook(book)} />
+                          ))}
                         </div>
-                      ) : (
-                        // DEFAULT SHELF VIEW (GROUPED BY STATUS)
-                        ['reading', 'want-to-read', 'read'].map(status => {
-                          // Filter books for this specific shelf
-                          const shelfBooks = books.filter(b => b.status === status);
-
-                          if (shelfBooks.length === 0) return null;
-
-                          return (
-                            <div key={status} className="mb-12">
-                              <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{statusLabels[status]}</h2>
-
-                              {/* The Cabinet/Shelf Container */}
-                              <div
-                                className={`transition-all duration-300 relative ${is3DMode ? 'p-8' : 'p-6 rounded-lg'}`}
-                                style={is3DMode ? {
-                                  /* 3D MODE: VINTAGE CABINET STYLE */
-                                  backgroundColor: darkMode ? '#1e140e' : '#f0e6d2',
-                                  backgroundImage: darkMode
-                                    ? 'radial-gradient(circle at 50% 50%, #3a2e26 0%, #1a120b 90%)'
-                                    : 'radial-gradient(circle at 50% 50%, #e8dcc8 0%, #c8aa81 90%)',
-                                  boxShadow: darkMode
-                                    ? 'inset 0 0 60px rgba(0,0,0,0.95), 0 20px 40px rgba(0,0,0,0.6)'
-                                    : 'inset 0 0 40px rgba(139,69,19,0.2), 0 10px 20px rgba(0,0,0,0.1)',
-                                  borderStyle: 'solid',
-                                  borderWidth: '16px',
-                                  borderTopColor: darkMode ? '#3e2b20' : '#e6c8a0',
-                                  borderLeftColor: darkMode ? '#322219' : '#deb887',
-                                  borderRightColor: darkMode ? '#261a12' : '#d2b48c',
-                                  borderBottomColor: darkMode ? '#1e140d' : '#c8aa81',
-                                  borderBottomWidth: '24px',
-                                  borderRadius: '4px',
-                                  minHeight: '340px',
-                                  display: 'flex',
-                                  alignItems: 'flex-end',
-                                  overflow: 'hidden'
-                                } : {
-                                  /* 2D MODE: FLAT SIMPLE STYLE */
-                                  background: darkMode
-                                    ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
-                                    : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
-                                  boxShadow: darkMode
-                                    ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
-                                    : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
-                                }}
-                              >
-                                {is3DMode && (
-                                  <>
-                                    {/* Inner corner shadows for extra depth */}
-                                    <div className="absolute inset-0 pointer-events-none" style={{
-                                      boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
-                                    }}></div>
-
-                                    {/* Shelf Shadow/Plank definition */}
-                                    <div
-                                      className="absolute bottom-0 left-0 right-0 h-4 pointer-events-none"
-                                      style={{
-                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))',
-                                        zIndex: 0
-                                      }}
-                                    ></div>
-                                  </>
-                                )}
-
-                                <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''} w-full relative z-10`}>
-                                  {shelfBooks.map(book => (
-                                    <BookSpine
-                                      key={book.id}
-                                      book={book}
-                                      onClick={() => setSelectedBook(book)}
-                                      is3D={is3DMode}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })
-                      )}
+                      </div>
                     </div>
                   );
-                })()}
+                })}
               </div>
             )}
 
@@ -1462,13 +1348,6 @@
                         />
                       ))}
                     </div>
-                    <button
-                      onClick={() => onDelete(book.id)}
-                      className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors ml-auto"
-                      title="Kitabı Sil"
-                    >
-                      <Trash2 size={20} />
-                    </button>
                   </div>
 
                   <div>
