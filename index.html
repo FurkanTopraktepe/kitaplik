@@ -367,6 +367,11 @@
       return (
         <div
           className="book-scene"
+          draggable="true"
+          onDragStart={(e) => {
+            e.dataTransfer.setData('bookId', book.id);
+            e.dataTransfer.effectAllowed = 'move';
+          }}
           onClick={onClick}
         >
           <div className="book-object">
@@ -449,7 +454,7 @@
       );
     };
 
-    const BookDetail = ({ book, onClose, onUpdate, onDelete, isDark }) => {
+    const BookDetail = ({ book, onClose, onUpdate, onDelete, isDark, collections, onUpdateCollection }) => {
       const [newHighlight, setNewHighlight] = useState('');
 
       const addHighlight = () => {
@@ -595,6 +600,35 @@
                     >
                       <Trash2 size={20} />
                     </button>
+                  </div>
+                </div>
+
+                {/* Collection Management inside Modal */}
+                <div className="mb-4">
+                  <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Koleksiyonlarım</label>
+                  <div className="flex flex-wrap gap-2">
+                    {collections.map(col => (
+                      <label
+                        key={col.id}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer transition-all border-2 ${col.bookIds.includes(book.id)
+                          ? 'bg-[#7B3F3F] border-[#7B3F3F] text-white'
+                          : isDark
+                            ? 'bg-[#2D2620] border-[#4A3B2F] text-[#E8D4BA] hover:bg-[#322822]'
+                            : 'bg-[#E8DCC8] border-[#C8A882] text-[#654321] hover:bg-[#E0D0B8]'
+                          }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className="hidden"
+                          checked={col.bookIds.includes(book.id)}
+                          onChange={() => onUpdateCollection(col.id, book.id)}
+                        />
+                        <span className="text-xs font-bold">{col.name}</span>
+                      </label>
+                    ))}
+                    {collections.length === 0 && (
+                      <span className="text-xs italic opacity-60 px-2 py-1">Henüz koleksiyon oluşturulmadı.</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -814,10 +848,24 @@
       };
 
       const removeFromCollection = (collectionId, bookId, e) => {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         setCollections(prev => prev.map(col => {
           if (col.id === collectionId) {
             return { ...col, bookIds: col.bookIds.filter(id => id != bookId) };
+          }
+          return col;
+        }));
+      };
+
+      const toggleBookInCollection = (collectionId, bookId) => {
+        setCollections(prev => prev.map(col => {
+          if (col.id === collectionId) {
+            const exists = col.bookIds.includes(bookId);
+            if (exists) {
+              return { ...col, bookIds: col.bookIds.filter(id => id !== bookId) };
+            } else {
+              return { ...col, bookIds: [...col.bookIds, bookId] };
+            }
           }
           return col;
         }));
@@ -1875,6 +1923,8 @@
                 onUpdate={updateBook}
                 onDelete={deleteBook}
                 isDark={isDark}
+                collections={collections}
+                onUpdateCollection={toggleBookInCollection}
               />
             )}
 
