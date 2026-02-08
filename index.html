@@ -1208,18 +1208,18 @@
 
             <div className="flex-1 space-y-2">
               <div
-                onClick={() => setActiveCollection(null)}
-                className={`p-2 rounded cursor-pointer flex items-center gap-2 ${activeCollection === null ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
+                onClick={() => { setActiveCollection(null); setView('library'); }}
+                className={`p-2 rounded cursor-pointer flex items-center gap-2 ${activeCollection === null && view === 'library' ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
               >
                 <BookOpen size={20} /> Tüm Kitaplar
               </div>
               {collections.map(col => (
                 <div
                   key={col.id}
-                  onClick={() => setActiveCollection(col.id)}
+                  onClick={() => { setActiveCollection(col.id); setView('library'); }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, col.id)}
-                  className={`p-2 rounded cursor-pointer group flex justify-between items-center ${activeCollection === col.id ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
+                  className={`p-2 rounded cursor-pointer group flex justify-between items-center ${activeCollection === col.id && view === 'library' ? (isDark ? 'bg-[#3E2B20]' : 'bg-[#E8DCC8]') : ''} ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}
                 >
                   <span className="truncate">{col.name} <span className="text-xs opacity-60">({col.bookIds.length})</span></span>
                   <Trash2 size={16} className="opacity-0 group-hover:opacity-100 hover:text-red-500" onClick={(e) => deleteCollection(col.id, e)} />
