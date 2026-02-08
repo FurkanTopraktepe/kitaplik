@@ -8,8 +8,9 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     .book-scene {
       perspective: 1200px;
@@ -76,13 +77,30 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React;
 
     // Lucide Icons as React components
     const BookOpen = ({ size = 24, ...props }) => (
       <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    );
+
+    const Book = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    );
+
+    const FileText = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <line x1="10" y1="9" x2="8" y2="9" />
       </svg>
     );
 
@@ -151,6 +169,31 @@
         <line x1="21" y1="12" x2="23" y2="12" />
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+    );
+
+    const Filter = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+      </svg>
+    );
+
+    const Edit2 = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+      </svg>
+    );
+
+    const Play = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+    );
+
+    const CheckCircle = ({ size = 24, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
       </svg>
     );
 
@@ -428,14 +471,8 @@
                       {book.genre || 'Tür Belirtilmemiş'}
                     </span>
                   </div>
-                  <button
-                    onClick={() => onDelete(book.id)}
-                    className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors"
-                    title="Kitabı Sil"
-                  >
-                    <Trash2 size={20} />
-                  </button>
                 </div>
+
 
                 <div className="mb-4 text-xs font-semibold">
                   {book.totalPages > 0 && (
@@ -530,6 +567,14 @@
                         onClick={() => onUpdate(book.id, { rating: star })}
                       />
                     ))}
+
+                    <button
+                      onClick={() => onDelete(book.id)}
+                      className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors ml-auto"
+                      title="Kitabı Sil"
+                    >
+                      <Trash2 size={20} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -586,8 +631,8 @@
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </div >
+        </div >
       );
     };
 
@@ -628,11 +673,14 @@
       const [streakData, setStreakData] = useState(() => {
         const saved = localStorage.getItem('bookshelf_streakData');
         const today = new Date().toISOString().split('T')[0];
-        const defaultData = { streak: 0, lastReadDate: '', dailyProgress: { date: today, minutes: 0 } };
+        const defaultData = { streak: 0, longestStreak: 0, lastReadDate: '', dailyProgress: { date: today, minutes: 0 } };
 
         if (!saved) return defaultData;
 
         const data = JSON.parse(saved);
+
+        // Ensure longestStreak exists for legacy data
+        if (!data.longestStreak) data.longestStreak = data.streak;
 
         // Reset daily progress if it's a new day
         if (data.dailyProgress.date !== today) {
@@ -746,6 +794,34 @@
       const [selectedBook, setSelectedBook] = useState(null);
       const [showAddBook, setShowAddBook] = useState(false);
       const [showLogReading, setShowLogReading] = useState(false);
+
+      // Search & Filter State
+      const [searchQuery, setSearchQuery] = useState('');
+      const [filterStatus, setFilterStatus] = useState('all');
+      const [filterGenre, setFilterGenre] = useState('all');
+      const [sortBy, setSortBy] = useState('date-desc'); // date-desc, date-asc, rating-desc, rating-asc, title-asc, title-desc, pages-desc, pages-asc
+
+      // Filter and Sort Logic
+      const filteredBooks = books.filter(book => {
+        const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          book.author.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = filterStatus === 'all' || book.status === filterStatus;
+        const matchesGenre = filterGenre === 'all' || book.genre === filterGenre;
+
+        return matchesSearch && matchesStatus && matchesGenre;
+      }).sort((a, b) => {
+        switch (sortBy) {
+          case 'date-desc': return b.id - a.id; // Assuming higher ID is newer
+          case 'date-asc': return a.id - b.id;
+          case 'rating-desc': return b.rating - a.rating;
+          case 'rating-asc': return a.rating - b.rating;
+          case 'title-asc': return a.title.localeCompare(b.title);
+          case 'title-desc': return b.title.localeCompare(a.title);
+          case 'pages-desc': return b.totalPages - a.totalPages;
+          case 'pages-asc': return a.totalPages - b.totalPages;
+          default: return 0;
+        }
+      });
       const [logMinutes, setLogMinutes] = useState('');
       const [newBook, setNewBook] = useState({
         title: '',
@@ -760,7 +836,7 @@
         totalPages: '',
         currentPage: 0
       });
-      const [searchQuery, setSearchQuery] = useState('');
+
 
       const statusLabels = {
         'want-to-read': 'Okunacak',
@@ -825,6 +901,11 @@
             if (streakData.lastReadDate !== today) {
               newStreak += 1;
               newLastReadDate = today;
+
+              // Update longest streak
+              if (newStreak > (streakData.longestStreak || 0)) {
+                streakData.longestStreak = newStreak;
+              }
             }
           }
 
@@ -893,10 +974,98 @@
         event.target.value = null;
       };
 
+      // Chart.js Logic with Cleanup
+      const genreChartRef = useRef(null);
+      const monthlyChartRef = useRef(null);
+
+      useEffect(() => {
+        if (view === 'stats') {
+          // Robust check for Chart.js availability
+          if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
+          }
+
+          const ctx1 = document.getElementById('genreChart');
+          const ctx2 = document.getElementById('monthlyChart');
+
+          if (ctx1 && ctx2) {
+            // Destroy existing charts to prevent "Canvas is already in use" error
+            if (genreChartRef.current) {
+              genreChartRef.current.destroy();
+            }
+            if (monthlyChartRef.current) {
+              monthlyChartRef.current.destroy();
+            }
+
+            // Genre Distribution
+            const genreCounts = genres.reduce((acc, genre) => {
+              acc[genre] = books.filter(b => b.genre === genre).length;
+              return acc;
+            }, {});
+
+            genreChartRef.current = new Chart(ctx1, {
+              type: 'doughnut',
+              data: {
+                labels: Object.keys(genreCounts),
+                datasets: [{
+                  data: Object.values(genreCounts),
+                  backgroundColor: [
+                    '#7B3F3F', '#8B6F47', '#5D4037', '#6B4423',
+                    '#904D5C', '#4A3428', '#D2B48C'
+                  ],
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'right',
+                    labels: { color: darkMode ? '#E8D4BA' : '#654321' }
+                  }
+                }
+              }
+            });
+
+            // Monthly Activity
+            monthlyChartRef.current = new Chart(ctx2, {
+              type: 'bar',
+              data: {
+                labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz'],
+                datasets: [{
+                  label: 'Okunan Kitap',
+                  data: [2, 1, 3, 4, 2, books.filter(b => b.status === 'read').length],
+                  backgroundColor: darkMode ? '#B89968' : '#8B4513',
+                  borderRadius: 4
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: { beginAtZero: true, grid: { color: darkMode ? '#4A3B2F' : '#E8DCC8' }, ticks: { color: darkMode ? '#B89968' : '#654321' } },
+                  x: { grid: { display: false }, ticks: { color: darkMode ? '#B89968' : '#654321' } }
+                },
+                plugins: { legend: { display: false } }
+              }
+            });
+          }
+        }
+
+        // Cleanup function
+        return () => {
+          if (genreChartRef.current) genreChartRef.current.destroy();
+          if (monthlyChartRef.current) monthlyChartRef.current.destroy();
+        };
+      }, [view, books, darkMode]);
+
       const stats = {
         total: books.length,
         read: books.filter(b => b.status === 'read').length,
         reading: books.filter(b => b.status === 'reading').length,
+        totalPages: books.reduce((sum, b) => sum + (Number(b.totalPages) || 0), 0),
         avgRating: books.filter(b => b.rating > 0).length > 0
           ? (books.filter(b => b.rating > 0).reduce((sum, b) => sum + b.rating, 0) / books.filter(b => b.rating > 0).length).toFixed(1)
           : 0
@@ -1037,98 +1206,182 @@
           <div className="max-w-7xl mx-auto">
             {view === 'library' && (
               <div>
-                {/* Search */}
-                <div className="mb-6">
-                  <div className="relative">
-                    <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#8B4513]'}`} size={20} />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Kitap ara..."
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg transition-colors ${darkMode
-                        ? 'bg-[#382E26] border-[#4A3B2F] text-[#E8D4BA] placeholder-[#A08060]'
-                        : 'bg-[#D4B896] border-[#C8A882] text-[#654321] placeholder-[#8B6F47]'
-                        }`}
-                    />
+                {/* Search & Filter Toolbar */}
+                <div className={`mb-6 p-4 rounded-lg shadow-md ${darkMode ? 'bg-[#382E26]' : 'bg-[#E8DCC8]'}`}>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    {/* Search */}
+                    <div className="flex-1 relative">
+                      <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#8B4513]'}`} size={20} />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Kitap veya yazar ara..."
+                        className={`w-full pl-10 pr-4 py-2 border-2 rounded ${darkMode
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA] placeholer-[#6B5A4A]'
+                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321] placeholder-[#A0856A]'
+                          }`}
+                      />
+                    </div>
+
+                    {/* Filters & Sort */}
+                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                      {/* Status Filter */}
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className={`p-2 border-2 rounded ${darkMode
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
+                          }`}
+                      >
+                        <option value="all">Tüm Durumlar</option>
+                        <option value="reading">Okunuyor</option>
+                        <option value="want-to-read">Okunacak</option>
+                        <option value="read">Okundu</option>
+                      </select>
+
+                      {/* Genre Filter */}
+                      <select
+                        value={filterGenre}
+                        onChange={(e) => setFilterGenre(e.target.value)}
+                        className={`p-2 border-2 rounded ${darkMode
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
+                          }`}
+                      >
+                        <option value="all">Tüm Türler</option>
+                        {genres.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+
+                      {/* Sort */}
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className={`p-2 border-2 rounded ${darkMode
+                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                          : 'border-[#C8A882] bg-[#F5E6D3] text-[#654321]'
+                          }`}
+                      >
+                        <option value="date-desc">En Yeni</option>
+                        <option value="date-asc">En Eski</option>
+                        <option value="rating-desc">Puan (Yüksek)</option>
+                        <option value="rating-asc">Puan (Düşük)</option>
+                        <option value="pages-desc">Sayfa (Çok)</option>
+                        <option value="pages-asc">Sayfa (Az)</option>
+                        <option value="title-asc">A-Z</option>
+                        <option value="title-desc">Z-A</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
-                {/* Bookshelf */}
-                {['read', 'reading', 'want-to-read'].map(status => {
-                  const filteredBooks = books.filter(b =>
-                    b.status === status &&
-                    (b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      b.author.toLowerCase().includes(searchQuery.toLowerCase()))
-                  );
-
-                  if (filteredBooks.length === 0) return null;
+                {/* Is Filtering or Searching? */}
+                {(() => {
+                  const isFiltering = searchQuery !== '' || filterStatus !== 'all' || filterGenre !== 'all' || sortBy !== 'date-desc';
 
                   return (
-                    <div key={status} className="mb-12">
-                      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{statusLabels[status]}</h2>
-
-                      {/* The Cabinet/Shelf Container */}
-                      <div
-                        className={`transition-all duration-300 relative ${is3DMode ? 'p-8' : 'p-6 rounded-lg'}`}
-                        style={is3DMode ? {
-                          /* 3D MODE: VINTAGE CABINET STYLE */
-                          backgroundColor: darkMode ? '#1e140e' : '#f0e6d2',
-                          backgroundImage: darkMode
-                            ? 'radial-gradient(circle at 50% 50%, #3a2e26 0%, #1a120b 90%)'
-                            : 'radial-gradient(circle at 50% 50%, #e8dcc8 0%, #c8aa81 90%)',
-                          boxShadow: darkMode
-                            ? 'inset 0 0 60px rgba(0,0,0,0.95), 0 20px 40px rgba(0,0,0,0.6)'
-                            : 'inset 0 0 40px rgba(139,69,19,0.2), 0 10px 20px rgba(0,0,0,0.1)',
-                          borderStyle: 'solid',
-                          borderWidth: '16px',
-                          borderTopColor: darkMode ? '#3e2b20' : '#e6c8a0',
-                          borderLeftColor: darkMode ? '#322219' : '#deb887',
-                          borderRightColor: darkMode ? '#261a12' : '#d2b48c',
-                          borderBottomColor: darkMode ? '#1e140d' : '#c8aa81',
-                          borderBottomWidth: '24px',
-                          borderRadius: '4px',
-                          minHeight: '340px',
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          overflow: 'hidden'
-                        } : {
-                          /* 2D MODE: FLAT SIMPLE STYLE */
-                          background: darkMode
-                            ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
-                            : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
-                          boxShadow: darkMode
-                            ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
-                            : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
-                        }}
-                      >
-                        {is3DMode && (
-                          <>
-                            {/* Inner corner shadows for extra depth */}
-                            <div className="absolute inset-0 pointer-events-none" style={{
-                              boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
-                            }}></div>
-
-                            {/* Shelf Shadow/Plank definition */}
-                            <div
-                              className="absolute bottom-0 left-0 right-0 h-4 pointer-events-none"
-                              style={{
-                                background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))',
-                                zIndex: 0
-                              }}
-                            ></div>
-                          </>
-                        )}
-
-                        <div className={`flex gap-2 items-end flex-wrap w-full relative z-10 ${is3DMode ? 'pl-4' : ''}`}>
-                          {filteredBooks.map(book => (
-                            <BookSpine key={book.id} book={book} is3D={is3DMode} onClick={() => setSelectedBook(book)} />
-                          ))}
+                    <div>
+                      {isFiltering ? (
+                        // SEARCH RESULTS VIEW (SINGLE GRID)
+                        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''}`}>
+                          {filteredBooks.length === 0 ? (
+                            <div className={`col-span-full text-center py-10 opacity-70 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                              <p className="text-xl italic">Aramanızla eşleşen kitap bulunamadı.</p>
+                            </div>
+                          ) : (
+                            filteredBooks.map(book => (
+                              <BookSpine
+                                key={book.id}
+                                book={book}
+                                onClick={() => setSelectedBook(book)}
+                                is3D={is3DMode}
+                              />
+                            ))
+                          )}
                         </div>
-                      </div>
+                      ) : (
+                        // DEFAULT SHELF VIEW (GROUPED BY STATUS)
+                        ['reading', 'want-to-read', 'read'].map(status => {
+                          // Filter books for this specific shelf
+                          const shelfBooks = books.filter(b => b.status === status);
+
+                          if (shelfBooks.length === 0) return null;
+
+                          return (
+                            <div key={status} className="mb-12">
+                              <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{statusLabels[status]}</h2>
+
+                              {/* The Cabinet/Shelf Container */}
+                              <div
+                                className={`transition-all duration-300 relative ${is3DMode ? 'p-8' : 'p-6 rounded-lg'}`}
+                                style={is3DMode ? {
+                                  /* 3D MODE: VINTAGE CABINET STYLE */
+                                  backgroundColor: darkMode ? '#1e140e' : '#f0e6d2',
+                                  backgroundImage: darkMode
+                                    ? 'radial-gradient(circle at 50% 50%, #3a2e26 0%, #1a120b 90%)'
+                                    : 'radial-gradient(circle at 50% 50%, #e8dcc8 0%, #c8aa81 90%)',
+                                  boxShadow: darkMode
+                                    ? 'inset 0 0 60px rgba(0,0,0,0.95), 0 20px 40px rgba(0,0,0,0.6)'
+                                    : 'inset 0 0 40px rgba(139,69,19,0.2), 0 10px 20px rgba(0,0,0,0.1)',
+                                  borderStyle: 'solid',
+                                  borderWidth: '16px',
+                                  borderTopColor: darkMode ? '#3e2b20' : '#e6c8a0',
+                                  borderLeftColor: darkMode ? '#322219' : '#deb887',
+                                  borderRightColor: darkMode ? '#261a12' : '#d2b48c',
+                                  borderBottomColor: darkMode ? '#1e140d' : '#c8aa81',
+                                  borderBottomWidth: '24px',
+                                  borderRadius: '4px',
+                                  minHeight: '340px',
+                                  display: 'flex',
+                                  alignItems: 'flex-end',
+                                  overflow: 'hidden'
+                                } : {
+                                  /* 2D MODE: FLAT SIMPLE STYLE */
+                                  background: darkMode
+                                    ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
+                                    : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
+                                  boxShadow: darkMode
+                                    ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
+                                    : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
+                                }}
+                              >
+                                {is3DMode && (
+                                  <>
+                                    {/* Inner corner shadows for extra depth */}
+                                    <div className="absolute inset-0 pointer-events-none" style={{
+                                      boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
+                                    }}></div>
+
+                                    {/* Shelf Shadow/Plank definition */}
+                                    <div
+                                      className="absolute bottom-0 left-0 right-0 h-4 pointer-events-none"
+                                      style={{
+                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))',
+                                        zIndex: 0
+                                      }}
+                                    ></div>
+                                  </>
+                                )}
+
+                                <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''} w-full relative z-10`}>
+                                  {shelfBooks.map(book => (
+                                    <BookSpine
+                                      key={book.id}
+                                      book={book}
+                                      onClick={() => setSelectedBook(book)}
+                                      is3D={is3DMode}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   );
-                })}
+                })()}
               </div>
             )}
 
@@ -1160,43 +1413,59 @@
             )}
 
             {view === 'stats' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+
+                {/* Summary Cards */}
                 <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Toplam Kitap</h3>
-                  <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.total}</p>
-                </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Okunan</h3>
-                  <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.read}</p>
-                </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Okunuyor</h3>
-                  <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.reading}</p>
-                </div>
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Ort. Puan</h3>
-                  <p className={`text-4xl font-bold flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
-                    {stats.avgRating}
-                    <Star size={24} fill="#FFD700" stroke="#FFD700" />
-                  </p>
-                </div>
-
-                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Günlük Hedef</h3>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={readingGoal}
-                      onChange={(e) => setReadingGoal(Number(e.target.value))}
-                      className={`w-20 p-2 border-2 rounded text-xl font-bold ${darkMode
-                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                        }`}
-                    />
-                    <span className={`text-xl ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>dk</span>
+                  <div className="flex justify-between items-end">
+                    <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.total}</p>
+                    <Book size={32} className="opacity-20" />
                   </div>
                 </div>
 
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Toplam Sayfa</h3>
+                  <div className="flex justify-between items-end">
+                    <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{stats.totalPages}</p>
+                    <FileText size={32} className="opacity-20" />
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>En Uzun Seri</h3>
+                  <div className="flex justify-between items-end">
+                    <p className={`text-4xl font-bold ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{streakData.longestStreak || streakData.streak} <span className="text-lg font-normal">gün</span></p>
+                    <Fire size={32} className="opacity-20 text-orange-500" />
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Ort. Puan</h3>
+                  <div className="flex justify-between items-end">
+                    <p className={`text-4xl font-bold flex items-center gap-2 ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>
+                      {stats.avgRating}
+                    </p>
+                    <Star size={32} fill="#FFD700" stroke="#FFD700" />
+                  </div>
+                </div>
+
+                {/* Charts Area */}
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Tür Dağılımı</h3>
+                  <div className="h-64 flex justify-center">
+                    <canvas id="genreChart"></canvas>
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Aylık Okuma Aktivitesi</h3>
+                  <div className="h-64 w-full">
+                    <canvas id="monthlyChart"></canvas>
+                  </div>
+                </div>
+
+                {/* Challenge & Goals (Existing) */}
                 <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <div className="flex items-center gap-2 mb-2">
                     <Award size={24} className={`${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`} />
@@ -1233,12 +1502,29 @@
                   </div>
                 </div>
 
-                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                {/* Daily Goal Input */}
+                <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
+                  <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Günlük Hedef</h3>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={readingGoal}
+                      onChange={(e) => setReadingGoal(Number(e.target.value))}
+                      className={`w-20 p-2 border-2 rounded text-xl font-bold ${darkMode
+                        ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                        : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                        }`}
+                    />
+                    <span className={`text-xl ${darkMode ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>dk</span>
+                  </div>
+                </div>
+
+                <div className={`p-6 rounded-lg shadow-lg col-span-1 md:col-span-2 lg:col-span-1 ${darkMode ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#B89968]' : 'text-[#654321]'}`}>Veri Yönetimi</h3>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={exportData}
-                      className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors ${darkMode
+                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded font-semibold transition-colors ${darkMode
                         ? 'bg-[#4A3B2F] text-[#E8D4BA] hover:bg-[#4D4439]'
                         : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                         }`}
@@ -1247,12 +1533,12 @@
                       Yedeği İndir
                     </button>
 
-                    <label className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors cursor-pointer ${darkMode
+                    <label className={`flex items-center justify-center gap-2 px-4 py-2 rounded font-semibold transition-colors cursor-pointer ${darkMode
                       ? 'bg-[#4A3B2F] text-[#E8D4BA] hover:bg-[#4D4439]'
                       : 'bg-[#C8A882] text-[#654321] hover:bg-[#B89872]'
                       }`}>
                       <Upload size={20} />
-                      Yedeği Geri Yükle
+                      Yedeği Yükle
                       <input
                         type="file"
                         accept=".json"
@@ -1262,6 +1548,7 @@
                     </label>
                   </div>
                 </div>
+
               </div>
             )}
           </div>
@@ -1348,6 +1635,13 @@
                         />
                       ))}
                     </div>
+                    <button
+                      onClick={() => onDelete(book.id)}
+                      className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors ml-auto"
+                      title="Kitabı Sil"
+                    >
+                      <Trash2 size={20} />
+                    </button>
                   </div>
 
                   <div>
