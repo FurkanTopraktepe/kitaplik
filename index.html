@@ -1729,143 +1729,149 @@
             {/* Add Book Modal */}
             {showAddBook && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className={`rounded-lg max-w-md w-full p-8 relative shadow-2xl ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
-                  <button
-                    onClick={() => setShowAddBook(false)}
-                    className={`absolute top-4 right-4 ${isDark ? 'text-[#E8D4BA] hover:text-[#B89968]' : 'text-[#654321] hover:text-[#5D3030]'}`}
-                  >
-                    <X size={24} />
-                  </button>
-
+                <div className={`rounded-lg max-w-3xl w-full p-8 relative shadow-2xl ${isDark ? 'bg-[#382E26]' : 'bg-[#D4B896]'}`}>
                   <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Yeni Kitap Ekle</h2>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kitap Adı</label>
-                      <input
-                        type="text"
-                        value={newBook.title}
-                        onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
-                        className={`w-full p-2 border-2 rounded ${isDark
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Yazar</label>
-                      <input
-                        type="text"
-                        value={newBook.author}
-                        onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
-                        className={`w-full p-2 border-2 rounded ${isDark
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Toplam Sayfa</label>
-                      <input
-                        type="number"
-                        value={newBook.totalPages}
-                        onChange={(e) => setNewBook({ ...newBook, totalPages: Number(e.target.value) })}
-                        placeholder="Örn: 350"
-                        className={`w-full p-2 border-2 rounded ${isDark
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      />
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Tür</label>
-                      <select
-                        value={newBook.genre}
-                        onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
-                        className={`w-full p-2 border-2 rounded ${isDark
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      >
-                        {genres.map(genre => (
-                          <option key={genre} value={genre}>{genre}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kapak Rengi</label>
-                      <div className="flex gap-2">
-                        {['#7B3F3F', '#904D5C', '#5D4037', '#6B4423', '#8B6F47', '#4A3428'].map(color => (
-                          <button
-                            key={color}
-                            onClick={() => setNewBook({ ...newBook, cover: color })}
-                            className={`w-10 h-10 rounded border-2 ${newBook.cover === color ? 'border-[#654321] scale-110' : 'border-[#D2B48C]'}`}
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                      <button
-                        onClick={() => onDelete(book.id)}
-                        className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors ml-auto"
-                        title="Kitabı Sil"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kapak Resmi (URL veya Yükle)</label>
-                      <div className="flex gap-2 mb-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kitap Adı</label>
                         <input
                           type="text"
-                          value={newBook.coverImage}
-                          onChange={(e) => setNewBook({ ...newBook, coverImage: e.target.value })}
-                          placeholder="https://..."
-                          className={`flex-1 p-2 border-2 rounded ${isDark
+                          value={newBook.title}
+                          onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+                          placeholder="Örn: Nutuk"
+                          className={`w-full p-2 border-2 rounded ${isDark
                             ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
                             : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
                             }`}
                         />
-                        <label className={`flex items-center justify-center w-12 rounded cursor-pointer transition-colors ${isDark
-                          ? 'bg-[#4A3B2F] hover:bg-[#4D4439] text-[#E8D4BA]'
-                          : 'bg-[#C8A882] hover:bg-[#B89872] text-[#654321]'}`}>
-                          <Upload size={20} />
+                      </div>
+
+                      <div>
+                        <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Yazar</label>
+                        <input
+                          type="text"
+                          value={newBook.author}
+                          onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
+                          placeholder="Örn: M. Kemal Atatürk"
+                          className={`w-full p-2 border-2 rounded ${isDark
+                            ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                            : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                            }`}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Tür</label>
+                          <select
+                            value={newBook.genre}
+                            onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
+                            className={`w-full p-2 border-2 rounded ${isDark
+                              ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                              : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                              }`}
+                          >
+                            {genres.map(genre => (
+                              <option key={genre} value={genre}>{genre}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Toplam Sayfa</label>
                           <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => handleImageUpload(e, setNewBook, newBook)}
+                            type="number"
+                            value={newBook.totalPages}
+                            onChange={(e) => setNewBook({ ...newBook, totalPages: Number(e.target.value) })}
+                            placeholder="350"
+                            className={`w-full p-2 border-2 rounded ${isDark
+                              ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                              : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                              }`}
                           />
-                        </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kapak Resmi (URL veya Yükle)</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newBook.coverImage}
+                            onChange={(e) => setNewBook({ ...newBook, coverImage: e.target.value })}
+                            placeholder="https://..."
+                            className={`flex-1 p-2 border-2 rounded ${isDark
+                              ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                              : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                              }`}
+                          />
+                          <label className={`flex items-center justify-center w-12 rounded cursor-pointer transition-colors ${isDark
+                            ? 'bg-[#4A3B2F] hover:bg-[#4D4439] text-[#E8D4BA]'
+                            : 'bg-[#C8A882] hover:bg-[#B89872] text-[#654321]'}`}>
+                            <Upload size={20} />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleImageUpload(e, setNewBook, newBook)}
+                            />
+                          </label>
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
-                      <select
-                        value={newBook.status}
-                        onChange={(e) => setNewBook({ ...newBook, status: e.target.value })}
-                        className={`w-full p-2 border-2 rounded ${isDark
-                          ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
-                          : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
-                          }`}
-                      >
-                        <option value="want-to-read">Okunacak</option>
-                        <option value="reading">Okunuyor</option>
-                        <option value="read">Okundu</option>
-                      </select>
-                    </div>
+                    {/* Right Column */}
+                    <div className="flex flex-col h-full">
+                      <div className="mb-4">
+                        <label className={`block text-sm font-semibold mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Durum</label>
+                        <select
+                          value={newBook.status}
+                          onChange={(e) => setNewBook({ ...newBook, status: e.target.value })}
+                          className={`w-full p-2 border-2 rounded ${isDark
+                            ? 'border-[#4A3B2F] bg-[#2D2620] text-[#E8D4BA]'
+                            : 'border-[#C8A882] bg-[#E8DCC8] text-[#654321]'
+                            }`}
+                        >
+                          <option value="want-to-read">Okunacak</option>
+                          <option value="reading">Okunuyor</option>
+                          <option value="read">Okundu</option>
+                        </select>
+                      </div>
 
-                    <button
-                      onClick={addBook}
-                      className="w-full py-3 bg-[#7B3F3F] text-white rounded-lg font-semibold hover:bg-[#5D3030] transition-colors"
-                    >
-                      Ekle
-                    </button>
+                      <div className="flex-1">
+                        <label className={`block text-sm font-semibold mb-3 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kapak Rengi</label>
+                        <div className="grid grid-cols-6 gap-2">
+                          {['#7B3F3F', '#904E5C', '#5D4037', '#6B4423', '#8B6F47', '#4A3428', '#2E4053', '#1E8449', '#D4AC0D', '#A04000', '#212121', '#78909C'].map(color => (
+                            <button
+                              key={color}
+                              onClick={() => setNewBook({ ...newBook, cover: color })}
+                              className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 ${newBook.cover === color ? 'border-white ring-2 ring-[#7B3F3F] scale-110' : 'border-transparent'}`}
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-auto flex gap-3 pt-6">
+                        <button
+                          onClick={() => setShowAddBook(false)}
+                          className={`flex-1 py-3 border-2 rounded-lg font-semibold transition-colors ${isDark
+                            ? 'border-[#4A3B2F] text-[#E8D4BA] hover:bg-[#4A3B2F]'
+                            : 'border-[#C8A882] text-[#654321] hover:bg-[#C8A882]'}`}
+                        >
+                          Vazgeç
+                        </button>
+                        <button
+                          onClick={addBook}
+                          className="flex-[2] py-3 bg-[#7B3F3F] text-white rounded-lg font-semibold hover:bg-[#5D3030] transition-colors shadow-lg"
+                        >
+                          Kitabı Ekle
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
