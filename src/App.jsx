@@ -2040,6 +2040,7 @@ const App = () => {
                     </div>
                   ))}
                 </div>
+              </div>
               {/* Floating Return to Mobile Button for narrow screens in forced desktop mode */}
               <button
                 onClick={() => {
