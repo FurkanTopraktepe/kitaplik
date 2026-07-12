@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Book, BookOpen, Clock, Users, Quote, TrendingUp, Award, Plus, Edit2, Trash2,
   ShoppingCart, Share2, Smartphone, Settings, Flame, Search, LayoutGrid,
-  Box, Upload, X, Bell, Download, Type, CheckCircle, ChevronLeft, ChevronRight, Monitor, Sparkles, RefreshCw
+  Box, Upload, X, Bell, Download, Type, CheckCircle, ChevronLeft, ChevronRight, Monitor, Sparkles, RefreshCw, AlignJustify
 } from 'lucide-react';
 
 import EBookReader from './components/EBookReader';
@@ -358,7 +358,11 @@ const App = () => {
   // Initialize 3D Mode
   const [is3DMode, setIs3DMode] = useState(() => {
     const savedMode = localStorage.getItem('bookshelf_is3DMode');
-    return savedMode ? JSON.parse(savedMode) : true;
+    return savedMode ? JSON.parse(savedMode) : false; // Default to 2D for cleaner initial load
+  });
+
+  const [libraryLayoutMode, setLibraryLayoutMode] = useState(() => {
+    return localStorage.getItem('bookshelf_libraryLayoutMode') || 'cover'; // Default to Cover View (Apple Books style)
   });
 
   const genres = ['Roman', 'Bilim Kurgu', 'Dünya Klasikleri', 'Kişisel Gelişim', 'Tarih', 'Felsefe', 'Diğer'];
@@ -663,6 +667,10 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('bookshelf_is3DMode', JSON.stringify(is3DMode));
   }, [is3DMode]);
+
+  useEffect(() => {
+    localStorage.setItem('bookshelf_libraryLayoutMode', libraryLayoutMode);
+  }, [libraryLayoutMode]);
 
   useEffect(() => {
     localStorage.setItem('bookshelf_books', JSON.stringify(books));
@@ -1624,13 +1632,33 @@ const App = () => {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => setIs3DMode(!is3DMode)}
-                        className={`p-3 rounded-full transition-all flex items-center gap-2 shadow-lg ${themeColors.button}`}
-                        title={is3DMode ? '2D Görünüme Geç' : '3D Görünüme Geç'}
-                      >
-                        {is3DMode ? <Box size={24} /> : <LayoutGrid size={24} />}
-                      </button>
+                      {/* Segmented Control for Layout Modes on Desktop */}
+                      <div className={`p-1 rounded-xl flex items-center gap-1 border ${isDark ? 'bg-[#2D2620] border-[#4A3B2F]' : 'bg-[#E8DCC8] border-[#C8A882]'}`}>
+                        <button
+                          onClick={() => { setIs3DMode(false); setLibraryLayoutMode('cover'); }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${(!is3DMode && libraryLayoutMode === 'cover') ? 'bg-[#7B3F3F] text-white shadow-sm' : 'opacity-65 hover:opacity-100'}`}
+                          title="Kapak Görünümü"
+                        >
+                          <LayoutGrid size={14} />
+                          <span>Kapak</span>
+                        </button>
+                        <button
+                          onClick={() => { setIs3DMode(false); setLibraryLayoutMode('spine'); }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${(!is3DMode && libraryLayoutMode === 'spine') ? 'bg-[#7B3F3F] text-white shadow-sm' : 'opacity-65 hover:opacity-100'}`}
+                          title="Sırt Görünümü"
+                        >
+                          <AlignJustify size={14} className="rotate-90" />
+                          <span>Sırt</span>
+                        </button>
+                        <button
+                          onClick={() => setIs3DMode(true)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${is3DMode ? 'bg-[#7B3F3F] text-white shadow-sm' : 'opacity-65 hover:opacity-100'}`}
+                          title="3D Görünüm"
+                        >
+                          <Box size={14} />
+                          <span>3D</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -1723,6 +1751,7 @@ const App = () => {
                       filteredBooks={filteredBooks}
                       is3DMode={is3DMode}
                       setIs3DMode={setIs3DMode}
+                      libraryLayoutMode={libraryLayoutMode}
                       collections={collections}
                       setCollections={setCollections}
                       createCollection={createCollection}
@@ -2162,12 +2191,31 @@ const App = () => {
                 <div className="animate-fade-in">
                   <div className="flex justify-between items-center mb-4">
                     <h1 className="text-3xl font-extrabold tracking-tight">Kitaplığım</h1>
-                    <button
-                      onClick={() => setShowAddBook(true)}
-                      className="p-2 bg-[#7B3F3F] text-white rounded-full"
-                    >
-                      <Plus size={20} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Segmented Control for Layout Modes on Mobile */}
+                      <div className={`p-0.5 rounded-lg flex items-center border text-[10px] ${isDark ? 'bg-[#2D2620] border-[#4A3B2F]' : 'bg-[#E8DCC8] border-[#C8A882]'}`}>
+                        <button
+                          onClick={() => setLibraryLayoutMode('cover')}
+                          className={`p-1.5 rounded font-bold transition-all flex items-center justify-center ${libraryLayoutMode === 'cover' ? 'bg-[#7B3F3F] text-white shadow-sm' : 'opacity-65'}`}
+                          title="Kapak Görünümü"
+                        >
+                          <LayoutGrid size={12} />
+                        </button>
+                        <button
+                          onClick={() => setLibraryLayoutMode('spine')}
+                          className={`p-1.5 rounded font-bold transition-all flex items-center justify-center ${libraryLayoutMode === 'spine' ? 'bg-[#7B3F3F] text-white shadow-sm' : 'opacity-65'}`}
+                          title="Sırt Görünümü"
+                        >
+                          <AlignJustify size={12} className="rotate-90" />
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setShowAddBook(true)}
+                        className="p-2 bg-[#7B3F3F] text-white rounded-full flex items-center justify-center shadow"
+                      >
+                        <Plus size={20} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-center gap-2 mb-4">
@@ -2207,6 +2255,7 @@ const App = () => {
                       filteredBooks={filteredBooks}
                       is3DMode={is3DMode}
                       setIs3DMode={setIs3DMode}
+                      libraryLayoutMode={libraryLayoutMode}
                       collections={collections}
                       setCollections={setCollections}
                       createCollection={createCollection}

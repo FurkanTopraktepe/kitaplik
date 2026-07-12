@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Star, Upload, Trash2, X, BookOpen, Clock, Share2, ShoppingCart, Quote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Upload, Trash2, X, BookOpen, Clock, Share2, ShoppingCart, Quote, LayoutGrid, AlignJustify } from 'lucide-react';
 
 // Plant pot ornament (Custom SVG terracotta plant)
 const PlantOrnament = () => (
@@ -73,6 +73,73 @@ const MiniArtOrnament = ({ isDark }) => (
     </div>
   </div>
 );
+
+const BookCover = ({ book, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      draggable="true"
+      onDragStart={(e) => {
+        e.dataTransfer.setData('bookId', book.id);
+      }}
+      className="relative cursor-pointer transition-all hover:translate-y-[-8px] hover:shadow-2xl flex-shrink-0 rounded-lg overflow-hidden shadow-md group"
+      style={{
+        width: '110px',
+        height: '165px',
+        backgroundColor: book.cover,
+        border: '1px solid rgba(0,0,0,0.15)',
+        boxShadow: '2px 4px 10px rgba(0,0,0,0.2)'
+      }}
+    >
+      {/* Cover Image */}
+      {book.coverImage ? (
+        <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+      ) : (
+        /* Minimalist text layout on solid cover background */
+        <div className="w-full h-full p-2.5 flex flex-col justify-between text-white relative">
+          {/* Subtle overlay for realism */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/25 via-transparent to-white/15 pointer-events-none" />
+          {/* Book Spine shadow overlay */}
+          <div className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-r from-black/35 to-transparent pointer-events-none" />
+          
+          <div className="relative z-10">
+            <h4 className="text-[8px] font-bold uppercase tracking-wider opacity-60 truncate">{book.genre || 'Genel'}</h4>
+            <h3 className="text-[10px] font-extrabold line-clamp-3 mt-0.5 leading-tight" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.6)' }}>
+              {book.title}
+            </h3>
+          </div>
+          
+          <div className="relative z-10">
+            <p className="text-[8px] opacity-80 font-medium truncate" style={{ textShadow: '1px 1px 1px rgba(0,0,0,0.6)' }}>
+              {book.author}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Badges/Progress indicator on cover */}
+      {book.totalPages > 0 && book.currentPage > 0 && book.status === 'reading' && (
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/40">
+          <div
+            className="h-full bg-green-500"
+            style={{ width: `${Math.min((book.currentPage / book.totalPages) * 100, 100)}%` }}
+          />
+        </div>
+      )}
+      {book.borrowedTo && (
+        <div className="absolute top-1.5 right-1.5 bg-yellow-500 text-black text-[8px] font-bold px-1 py-0.5 rounded shadow" title={`Ödünçte: ${book.borrowedTo}`}>
+          🤝
+        </div>
+      )}
+      {book.rating > 0 && (
+        <div className="absolute top-1.5 left-2 bg-black/55 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+          <Star size={8} fill="#FFD700" stroke="#FFD700" />
+          <span>{book.rating}</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const BookSpine = ({ book, onClick, is3D }) => {
   if (!is3D) {
@@ -355,6 +422,7 @@ const LibraryView = ({
   filteredBooks,
   is3DMode,
   setIs3DMode,
+  libraryLayoutMode = 'cover',
   collections,
   setCollections,
   createCollection,
@@ -580,21 +648,43 @@ const LibraryView = ({
       })()}
 
       {isFiltering ? (
-        // SEARCH RESULTS VIEW (SINGLE GRID)
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${is3DMode ? 'perspective-[1000px]' : ''}`}>
+        // SEARCH RESULTS VIEW (SINGLE GRID/FLEX)
+        <div className={is3DMode && window.innerWidth >= 768 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-[1000px]" : "flex flex-wrap gap-6 justify-center md:justify-start"}>
           {filteredBooks.length === 0 ? (
             <div className={`col-span-full text-center py-10 opacity-70 ${themeColors.text}`}>
               <p className="text-xl italic">Aramanızla eşleşen kitap bulunamadı.</p>
             </div>
           ) : (
-            filteredBooks.map(book => (
-              <BookSpine
-                key={book.id}
-                book={book}
-                onClick={() => setSelectedBook(book)}
-                is3D={is3DMode}
-              />
-            ))
+            filteredBooks.map(book => {
+              const is3DActive = is3DMode && window.innerWidth >= 768;
+              if (is3DActive) {
+                return (
+                  <BookSpine
+                    key={book.id}
+                    book={book}
+                    onClick={() => setSelectedBook(book)}
+                    is3D={true}
+                  />
+                );
+              } else if (libraryLayoutMode === 'cover') {
+                return (
+                  <BookCover
+                    key={book.id}
+                    book={book}
+                    onClick={() => setSelectedBook(book)}
+                  />
+                );
+              } else {
+                return (
+                  <BookSpine
+                    key={book.id}
+                    book={book}
+                    onClick={() => setSelectedBook(book)}
+                    is3D={false}
+                  />
+                );
+              }
+            })
           )}
         </div>
       ) : (
@@ -605,6 +695,7 @@ const LibraryView = ({
         ).map(group => {
           const shelfBooks = group.books;
           if (shelfBooks.length === 0) return null;
+          const is3DActive = is3DMode && window.innerWidth >= 768;
 
           return (
             <div key={group.id} className="mb-12 animate-fade-in">
@@ -612,8 +703,8 @@ const LibraryView = ({
 
               {/* The Cabinet/Shelf Container */}
               <div
-                className={`transition-all duration-300 relative ${is3DMode ? 'p-8' : 'p-6 rounded-lg'}`}
-                style={is3DMode ? {
+                className={`transition-all duration-300 relative ${is3DActive ? 'p-8' : 'p-6 rounded-lg'}`}
+                style={is3DActive ? {
                   backgroundColor: isDark ? '#1e140e' : '#f0e6d2',
                   backgroundImage: isDark
                     ? 'radial-gradient(circle at 50% 50%, #3a2e26 0%, #1a120b 90%)'
@@ -642,7 +733,7 @@ const LibraryView = ({
                     : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
                 }}
               >
-                {is3DMode && (
+                {is3DActive && (
                   <>
                     <div className="absolute inset-0 pointer-events-none" style={{
                       boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
@@ -659,16 +750,37 @@ const LibraryView = ({
                 )}
 
                 <div className={`flex flex-wrap items-end justify-start gap-3 w-full relative z-10 pl-4 pr-12 pb-1 overflow-x-auto min-h-[300px]`}>
-                  {is3DMode && <MiniArtOrnament isDark={isDark} />}
+                  {is3DActive && <MiniArtOrnament isDark={isDark} />}
 
-                  {shelfBooks.map(book => (
-                    <BookSpine
-                      key={book.id}
-                      book={book}
-                      onClick={() => setSelectedBook(book)}
-                      is3D={is3DMode}
-                    />
-                  ))}
+                  {shelfBooks.map(book => {
+                    if (is3DActive) {
+                      return (
+                        <BookSpine
+                          key={book.id}
+                          book={book}
+                          onClick={() => setSelectedBook(book)}
+                          is3D={true}
+                        />
+                      );
+                    } else if (libraryLayoutMode === 'cover') {
+                      return (
+                        <BookCover
+                          key={book.id}
+                          book={book}
+                          onClick={() => setSelectedBook(book)}
+                        />
+                      );
+                    } else {
+                      return (
+                        <BookSpine
+                          key={book.id}
+                          book={book}
+                          onClick={() => setSelectedBook(book)}
+                          is3D={false}
+                        />
+                      );
+                    }
+                  })}
 
                   {shelfBooks.length >= 2 && <CoffeeOrnament />}
                   <PlantOrnament />

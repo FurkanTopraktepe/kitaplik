@@ -1,5 +1,5 @@
-import React from 'react';
-import { Rss, Search, Users, Trophy, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Rss, Search, Users, Trophy, RefreshCw, Menu, X } from 'lucide-react';
 
 const SocialFeed = ({
   books,
@@ -30,10 +30,37 @@ const SocialFeed = ({
   connectAsHost,
   connectAsGuest
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="flex-grow flex gap-6 min-h-0 text-sm overflow-hidden animate-fade-in pb-12">
-      {/* Left Sidebar inside Social View */}
-      <div className="w-64 flex flex-col gap-4 flex-shrink-0">
+    <div className="flex-grow flex flex-col md:flex-row gap-6 min-h-0 text-sm overflow-hidden animate-fade-in pb-12 relative">
+      {/* Mobile Menu Backdrop */}
+      {isMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-xs z-40 transition-opacity duration-300"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* Left Sidebar inside Social View (Collapsible drawer on mobile) */}
+      <div className={`
+        fixed md:relative top-0 bottom-0 left-0 w-64 p-6 md:p-0
+        flex flex-col gap-4 flex-shrink-0
+        bg-[#E8DCC8] dark:bg-[#2D2620] md:bg-transparent dark:md:bg-transparent
+        border-r md:border-none border-gray-400/20
+        h-screen md:h-auto overflow-y-auto
+        z-50 md:z-auto transition-transform duration-300
+        ${isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'}
+        ${isMenuOpen ? 'flex' : 'hidden md:flex'}
+      `}>
+        {/* Mobile menu header */}
+        <div className="md:hidden flex justify-between items-center pb-3 border-b border-gray-400/10 mb-2">
+          <span className="font-bold text-xs opacity-75">Menü</span>
+          <button onClick={() => setIsMenuOpen(false)} className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5">
+            <X size={18} />
+          </button>
+        </div>
+
         {/* Profile Summary Card */}
         <div className={`p-4 rounded-xl border ${isDark ? 'bg-[#1e1e1e]/90 border-white/10' : 'bg-white/80 border-black/10 shadow-sm'} space-y-3`}>
           <div className="flex items-center gap-3">
@@ -86,7 +113,10 @@ const SocialFeed = ({
             return (
               <button
                 key={sub.id}
-                onClick={() => setSocialTab(sub.id)}
+                onClick={() => {
+                  setSocialTab(sub.id);
+                  setIsMenuOpen(false);
+                }}
                 className={`w-full text-left p-2 rounded-lg font-bold text-xs transition-all flex items-center gap-2.5 ${socialTab === sub.id ? 'bg-[#7B3F3F] text-white shadow-sm' : `hover:bg-black/5 dark:hover:bg-white/5 ${themeColors.text}`}`}
               >
                 <IconComponent size={16} className="opacity-80" />
@@ -98,7 +128,30 @@ const SocialFeed = ({
       </div>
 
       {/* Right Panel / Social View Content */}
-      <div className="flex-grow overflow-y-auto pr-1">
+      <div className="flex-grow overflow-y-auto pr-1 flex flex-col min-h-0">
+        {/* Mobile Navigation Header for Social Feed */}
+        <div className="md:hidden flex items-center justify-between p-3.5 rounded-2xl mb-4 border bg-black/5 dark:bg-white/5 border-gray-400/5 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="p-2.5 rounded-xl bg-[#7B3F3F] text-white shadow active:scale-95 transition-all flex items-center justify-center"
+            >
+              <Menu size={16} />
+            </button>
+            <span className="font-extrabold text-xs">
+              {socialTab === 'feed' && 'Aktivite Akışı'}
+              {socialTab === 'friends' && 'Okur Arama'}
+              {socialTab === 'clubs' && 'Okuma Kulüpleri'}
+              {socialTab === 'leaderboard' && 'Haftalık Yarışma'}
+              {socialTab === 'swap' && 'Takas Pazarı'}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-xs opacity-80">
+            <span className="text-xl">{userProfile.avatar || '👤'}</span>
+            <span className="font-extrabold truncate max-w-[90px]">{userProfile.name}</span>
+          </div>
+        </div>
         {(() => {
           switch (socialTab) {
             case 'feed':
