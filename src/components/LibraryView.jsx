@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Star, Upload, Trash2, X, BookOpen, Clock, Share2, ShoppingCart, Quote, LayoutGrid, AlignJustify } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Upload, Trash2, X, BookOpen, Clock, Share2, ShoppingCart, Quote, LayoutGrid, AlignJustify, Settings } from 'lucide-react';
 
 // Plant pot ornament (Custom SVG terracotta plant)
-const PlantOrnament = () => (
-  <div className="flex flex-col items-center justify-end h-[280px] w-[60px] pb-1 select-none pointer-events-none transition-transform hover:scale-105" title="Siyah Seramik Saksıda Salon Yaprağı">
+const PlantOrnament = ({ scale = 1 }) => (
+  <div 
+    className="flex flex-col items-center justify-end select-none pointer-events-none transition-transform hover:scale-105" 
+    style={{ 
+      height: `${280 * scale}px`, 
+      width: `${60 * scale}px`, 
+      transform: `scale(${scale})`,
+      transformOrigin: 'bottom center'
+    }}
+    title="Siyah Seramik Saksıda Salon Yaprağı"
+  >
     <svg className="w-12 h-24 mb-1 overflow-visible" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Terracotta/Ceramic Pot */}
       <path d="M25 140 H75 L70 190 H30 Z" fill="#8d5b4c" stroke="#5d392e" strokeWidth="3" strokeLinejoin="round" />
@@ -26,8 +35,17 @@ const PlantOrnament = () => (
 );
 
 // Cup/Coffee ornament (Animated Steam Mug)
-const CoffeeOrnament = () => (
-  <div className="flex flex-col items-center justify-end h-[280px] w-[50px] pb-1 select-none pointer-events-none transition-transform hover:scale-105" title="Sıcak Filtre Kahve Kupası">
+const CoffeeOrnament = ({ scale = 1 }) => (
+  <div 
+    className="flex flex-col items-center justify-end select-none pointer-events-none transition-transform hover:scale-105" 
+    style={{ 
+      height: `${280 * scale}px`, 
+      width: `${50 * scale}px`, 
+      transform: `scale(${scale})`,
+      transformOrigin: 'bottom center'
+    }}
+    title="Sıcak Filtre Kahve Kupası"
+  >
     <svg className="w-10 h-16 mb-1 overflow-visible" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Animated Rising Steam paths */}
       <path d="M30 30 Q25 20, 30 10 T25 0" stroke="#a0856a" strokeWidth="2" strokeLinecap="round" opacity="0.6">
@@ -48,8 +66,16 @@ const CoffeeOrnament = () => (
 );
 
 // Art frame ornament (Custom Scenic Picture Frame)
-const MiniArtOrnament = ({ isDark }) => (
-  <div className="flex flex-col items-center justify-end h-[280px] w-[80px] pb-1 select-none pointer-events-none">
+const MiniArtOrnament = ({ isDark, scale = 1 }) => (
+  <div 
+    className="flex flex-col items-center justify-end select-none pointer-events-none"
+    style={{ 
+      height: `${280 * scale}px`, 
+      width: `${80 * scale}px`, 
+      transform: `scale(${scale})`,
+      transformOrigin: 'bottom center'
+    }}
+  >
     <div
       className="w-[70px] h-[95px] mb-2 rounded shadow-lg p-1.5 flex flex-col items-center justify-center transition-all hover:scale-105"
       style={{
@@ -74,13 +100,81 @@ const MiniArtOrnament = ({ isDark }) => (
   </div>
 );
 
-const BookCover = ({ book, onClick }) => {
+// Clock ornament (Retro Table Alarm Clock)
+const ClockOrnament = ({ scale = 1 }) => (
+  <div 
+    className="flex flex-col items-center justify-end select-none pointer-events-none transition-transform hover:scale-105" 
+    style={{ 
+      height: `${280 * scale}px`, 
+      width: `${55 * scale}px`, 
+      transform: `scale(${scale})`,
+      transformOrigin: 'bottom center'
+    }}
+    title="Retro Masa Saati"
+  >
+    <svg className="w-12 h-16 mb-1 overflow-visible" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Alarm bells */}
+      <circle cx="22" cy="42" r="10" fill="#a1a1aa" stroke="#71717a" strokeWidth="2" />
+      <circle cx="58" cy="42" r="10" fill="#a1a1aa" stroke="#71717a" strokeWidth="2" />
+      <path d="M22 32 Q40 25, 58 32" stroke="#71717a" strokeWidth="3" fill="none" />
+      {/* Clock legs */}
+      <line x1="20" y1="100" x2="10" y2="115" stroke="#71717a" strokeWidth="5" strokeLinecap="round" />
+      <line x1="60" y1="100" x2="70" y2="115" stroke="#71717a" strokeWidth="5" strokeLinecap="round" />
+      {/* Clock body */}
+      <circle cx="40" cy="72" r="30" fill="#dc2626" stroke="#991b1b" strokeWidth="3" />
+      <circle cx="40" cy="72" r="23" fill="#f8fafc" />
+      {/* Hour/Minute hands */}
+      <line x1="40" y1="72" x2="40" y2="58" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="40" y1="72" x2="52" y2="72" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  </div>
+);
+
+// Trophy ornament (Golden Achievement Trophy)
+const TrophyOrnament = ({ scale = 1 }) => (
+  <div 
+    className="flex flex-col items-center justify-end select-none pointer-events-none transition-transform hover:scale-105" 
+    style={{ 
+      height: `${280 * scale}px`, 
+      width: `${60 * scale}px`, 
+      transform: `scale(${scale})`,
+      transformOrigin: 'bottom center'
+    }}
+    title="Başarı Kupası"
+  >
+    <svg className="w-12 h-20 mb-1 overflow-visible" viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Base */}
+      <rect x="25" y="115" width="50" height="15" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="2" />
+      <rect x="35" y="100" width="30" height="15" fill="#334155" stroke="#1e293b" strokeWidth="2" />
+      {/* Stem */}
+      <path d="M45 80 H55 V100 H45 Z" fill="#eab308" stroke="#ca8a04" strokeWidth="2" />
+      {/* Cup handles */}
+      <path d="M25 45 C10 45, 10 70, 30 70" stroke="#eab308" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path d="M75 45 C90 45, 90 70, 70 70" stroke="#eab308" strokeWidth="5" fill="none" strokeLinecap="round" />
+      {/* Cup body */}
+      <path d="M25 35 H75 C75 75, 25 75, 25 35 Z" fill="#facc15" stroke="#eab308" strokeWidth="3" />
+      {/* Star emblem */}
+      <path d="M50 43 L53 49 L60 50 L55 55 L56 61 L50 58 L44 61 L45 55 L40 50 L47 49 Z" fill="#ca8a04" />
+    </svg>
+  </div>
+);
+
+const BookCover = ({ book, onClick, onReorder }) => {
   return (
     <div
       onClick={onClick}
       draggable="true"
       onDragStart={(e) => {
         e.dataTransfer.setData('bookId', book.id);
+      }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const draggedId = Number(e.dataTransfer.getData('bookId'));
+        if (draggedId && draggedId !== book.id) {
+          onReorder(draggedId, book.id);
+        }
       }}
       className="relative cursor-pointer transition-all hover:translate-y-[-8px] hover:shadow-2xl flex-shrink-0 rounded-lg overflow-hidden shadow-md group"
       style={{
@@ -141,7 +235,7 @@ const BookCover = ({ book, onClick }) => {
   );
 };
 
-const BookSpine = ({ book, onClick, is3D }) => {
+const BookSpine = ({ book, onClick, is3D, onReorder }) => {
   if (!is3D) {
     return (
       <div
@@ -149,6 +243,15 @@ const BookSpine = ({ book, onClick, is3D }) => {
         draggable="true"
         onDragStart={(e) => {
           e.dataTransfer.setData('bookId', book.id);
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const draggedId = Number(e.dataTransfer.getData('bookId'));
+          if (draggedId && draggedId !== book.id) {
+            onReorder(draggedId, book.id);
+          }
         }}
         className="relative cursor-pointer transition-all hover:translate-y-[-8px] hover:shadow-xl mr-1 mb-2 flex-shrink-0"
         style={{
@@ -196,6 +299,15 @@ const BookSpine = ({ book, onClick, is3D }) => {
       onDragStart={(e) => {
         e.dataTransfer.setData('bookId', book.id);
         e.dataTransfer.effectAllowed = 'move';
+      }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const draggedId = Number(e.dataTransfer.getData('bookId'));
+        if (draggedId && draggedId !== book.id) {
+          onReorder(draggedId, book.id);
+        }
       }}
       onClick={onClick}
     >
@@ -423,12 +535,15 @@ const LibraryView = ({
   is3DMode,
   setIs3DMode,
   libraryLayoutMode = 'cover',
+  shelfOrnaments,
+  setShelfOrnaments,
   collections,
   setCollections,
   createCollection,
   onUpdateCollection,
   handleDragOver,
   handleDrop,
+  onReorderBooks,
   getQuoteOfTheDay,
   setActiveQuoteIndex,
   openQuoteCreator,
@@ -444,6 +559,23 @@ const LibraryView = ({
   deleteEbookFile,
   handleImageUpload
 }) => {
+  const [activeShelfCustomize, setActiveShelfCustomize] = useState(null);
+
+  const renderOrnament = (type, scale) => {
+    switch (type) {
+      case 'plant':
+        return <PlantOrnament scale={scale} />;
+      case 'coffee':
+        return <CoffeeOrnament scale={scale} />;
+      case 'clock':
+        return <ClockOrnament scale={scale} />;
+      case 'trophy':
+        return <TrophyOrnament scale={scale} />;
+      default:
+        return null;
+    }
+  };
+
   const statusLabels = {
     'all': 'Tüm Kitaplar',
     'want-to-read': 'Okunacaklar',
@@ -664,6 +796,7 @@ const LibraryView = ({
                     book={book}
                     onClick={() => setSelectedBook(book)}
                     is3D={true}
+                    onReorder={onReorderBooks}
                   />
                 );
               } else if (libraryLayoutMode === 'cover') {
@@ -672,6 +805,7 @@ const LibraryView = ({
                     key={book.id}
                     book={book}
                     onClick={() => setSelectedBook(book)}
+                    onReorder={onReorderBooks}
                   />
                 );
               } else {
@@ -681,6 +815,7 @@ const LibraryView = ({
                     book={book}
                     onClick={() => setSelectedBook(book)}
                     is3D={false}
+                    onReorder={onReorderBooks}
                   />
                 );
               }
@@ -697,13 +832,93 @@ const LibraryView = ({
           if (shelfBooks.length === 0) return null;
           const is3DActive = is3DMode && window.innerWidth >= 768;
 
+          const getMinHeight = () => {
+            if (is3DActive) return '340px';
+            if (libraryLayoutMode === 'cover') return '220px';
+            return '310px';
+          };
+
+          const leftOrnamentType = shelfOrnaments?.[group.id]?.left || 'none';
+          const rightOrnamentType = shelfOrnaments?.[group.id]?.right || 'none';
+          const scaleFactor = libraryLayoutMode === 'cover' ? 0.6 : 1.0;
+
           return (
             <div key={group.id} className="mb-12 animate-fade-in">
-              <h2 className={`text-2xl font-bold mb-4 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{group.title}</h2>
+              <div className="flex justify-between items-center mb-4 relative">
+                <h2 className={`text-2xl font-bold ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>{group.title}</h2>
+                
+                {/* Customize Shelf Button */}
+                <button
+                  onClick={() => setActiveShelfCustomize(activeShelfCustomize === group.id ? null : group.id)}
+                  className={`p-2 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold ${activeShelfCustomize === group.id ? 'bg-[#7B3F3F] text-white border-[#7B3F3F]' : 'border-gray-400/20 opacity-70 hover:opacity-100'}`}
+                  title="Süsleri Özelleştir"
+                >
+                  <Settings size={14} className={activeShelfCustomize === group.id ? 'animate-spin' : ''} style={{ animationDuration: '6s' }} />
+                  <span className="hidden sm:inline">Süsleri Özelleştir</span>
+                </button>
+
+                {/* Shelf Customize Dropdown */}
+                {activeShelfCustomize === group.id && (
+                  <div className={`absolute right-0 top-10 z-30 p-4 rounded-xl border shadow-xl w-60 animate-fade-in ${isDark ? 'bg-[#2D2620] border-[#4A3B2F] text-[#E8D4BA]' : 'bg-[#FDFBF7] border-[#C8A882] text-[#654321]'}`}>
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-400/10 mb-3">
+                      <span className="font-extrabold text-xs">Raf Süsleri</span>
+                      <button onClick={() => setActiveShelfCustomize(null)} className="text-[10px] hover:underline font-bold">Kapat</button>
+                    </div>
+                    
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <label className="block font-bold mb-1 opacity-75">Sol Köşe Süsü:</label>
+                        <select
+                          value={leftOrnamentType}
+                          onChange={(e) => {
+                            setShelfOrnaments(prev => ({
+                              ...prev,
+                              [group.id]: {
+                                ...(prev[group.id] || { left: 'none', right: 'none' }),
+                                left: e.target.value
+                              }
+                            }));
+                          }}
+                          className={`w-full p-1.5 rounded border ${isDark ? 'bg-[#1e140e] border-[#4A3B2F] text-[#E8D4BA]' : 'bg-white border-[#C8A882] text-[#654321]'}`}
+                        >
+                          <option value="none">Süs Yok</option>
+                          <option value="plant">🪴 Salon Yaprağı</option>
+                          <option value="coffee">☕ Kahve Kupası</option>
+                          <option value="clock">⏰ Masa Saati</option>
+                          <option value="trophy">🏆 Başarı Kupası</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block font-bold mb-1 opacity-75">Sağ Köşe Süsü:</label>
+                        <select
+                          value={rightOrnamentType}
+                          onChange={(e) => {
+                            setShelfOrnaments(prev => ({
+                              ...prev,
+                              [group.id]: {
+                                ...(prev[group.id] || { left: 'none', right: 'none' }),
+                                right: e.target.value
+                              }
+                            }));
+                          }}
+                          className={`w-full p-1.5 rounded border ${isDark ? 'bg-[#1e140e] border-[#4A3B2F] text-[#E8D4BA]' : 'bg-white border-[#C8A882] text-[#654321]'}`}
+                        >
+                          <option value="none">Süs Yok</option>
+                          <option value="plant">🪴 Salon Yaprağı</option>
+                          <option value="coffee">☕ Kahve Kupası</option>
+                          <option value="clock">⏰ Masa Saati</option>
+                          <option value="trophy">🏆 Başarı Kupası</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* The Cabinet/Shelf Container */}
               <div
-                className={`transition-all duration-300 relative ${is3DActive ? 'p-8' : 'p-6 rounded-lg'}`}
+                className={`transition-all duration-300 relative ${is3DActive ? 'p-8' : 'px-6 pt-4 pb-2.5 rounded-lg'}`}
                 style={is3DActive ? {
                   backgroundColor: isDark ? '#1e140e' : '#f0e6d2',
                   backgroundImage: isDark
@@ -726,11 +941,17 @@ const LibraryView = ({
                   overflow: 'hidden'
                 } : {
                   background: isDark
-                    ? 'linear-gradient(to bottom, #4A3B2F 0%, #382E26 100%)'
-                    : 'linear-gradient(to bottom, #D4B896 0%, #C8A882 100%)',
+                    ? 'linear-gradient(to bottom, #3A2E26 0%, #2E221B 85%, #251B15 100%)'
+                    : 'linear-gradient(to bottom, #EADCC9 0%, #DBC5AA 85%, #cbb194 100%)',
+                  borderBottom: isDark ? '12px solid #1a120e' : '12px solid #ae9578',
                   boxShadow: isDark
-                    ? 'inset 0 -4px 8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4)'
-                    : 'inset 0 -4px 8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
+                    ? 'inset 0 4px 8px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.4)'
+                    : 'inset 0 4px 8px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.15)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  minHeight: getMinHeight(),
+                  overflow: 'hidden'
                 }}
               >
                 {is3DActive && (
@@ -749,8 +970,18 @@ const LibraryView = ({
                   </>
                 )}
 
-                <div className={`flex flex-wrap items-end justify-start gap-3 w-full relative z-10 pl-4 pr-12 pb-1 overflow-x-auto min-h-[300px]`}>
-                  {is3DActive && <MiniArtOrnament isDark={isDark} />}
+                <div 
+                  className="flex flex-wrap items-end justify-start gap-4 w-full relative z-10 overflow-x-auto"
+                  style={{ minHeight: is3DActive ? '260px' : `calc(${getMinHeight()} - 28px)` }}
+                >
+                  {/* Left corner ornament */}
+                  {!is3DActive && leftOrnamentType !== 'none' && (
+                    <div className="flex-shrink-0 mr-1 animate-fade-in">
+                      {renderOrnament(leftOrnamentType, scaleFactor)}
+                    </div>
+                  )}
+
+                  {is3DActive && <MiniArtOrnament isDark={isDark} scale={1.0} />}
 
                   {shelfBooks.map(book => {
                     if (is3DActive) {
@@ -760,6 +991,7 @@ const LibraryView = ({
                           book={book}
                           onClick={() => setSelectedBook(book)}
                           is3D={true}
+                          onReorder={onReorderBooks}
                         />
                       );
                     } else if (libraryLayoutMode === 'cover') {
@@ -768,6 +1000,7 @@ const LibraryView = ({
                           key={book.id}
                           book={book}
                           onClick={() => setSelectedBook(book)}
+                          onReorder={onReorderBooks}
                         />
                       );
                     } else {
@@ -777,13 +1010,18 @@ const LibraryView = ({
                           book={book}
                           onClick={() => setSelectedBook(book)}
                           is3D={false}
+                          onReorder={onReorderBooks}
                         />
                       );
                     }
                   })}
 
-                  {shelfBooks.length >= 2 && <CoffeeOrnament />}
-                  <PlantOrnament />
+                  {/* Right corner ornament */}
+                  {!is3DActive && rightOrnamentType !== 'none' && (
+                    <div className="flex-shrink-0 ml-1 animate-fade-in">
+                      {renderOrnament(rightOrnamentType, scaleFactor)}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

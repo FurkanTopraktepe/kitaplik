@@ -365,6 +365,16 @@ const App = () => {
     return localStorage.getItem('bookshelf_libraryLayoutMode') || 'cover'; // Default to Cover View (Apple Books style)
   });
 
+  const [shelfOrnaments, setShelfOrnaments] = useState(() => {
+    const saved = localStorage.getItem('bookshelf_shelfOrnaments');
+    return saved ? JSON.parse(saved) : {
+      'all': { left: 'plant', right: 'coffee' },
+      'want-to-read': { left: 'plant', right: 'none' },
+      'reading': { left: 'none', right: 'coffee' },
+      'read': { left: 'trophy', right: 'plant' }
+    };
+  });
+
   const genres = ['Roman', 'Bilim Kurgu', 'Dünya Klasikleri', 'Kişisel Gelişim', 'Tarih', 'Felsefe', 'Diğer'];
 
   // Initialize Reading Goals & Streak
@@ -671,6 +681,10 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem('bookshelf_libraryLayoutMode', libraryLayoutMode);
   }, [libraryLayoutMode]);
+
+  useEffect(() => {
+    localStorage.setItem('bookshelf_shelfOrnaments', JSON.stringify(shelfOrnaments));
+  }, [shelfOrnaments]);
 
   useEffect(() => {
     localStorage.setItem('bookshelf_books', JSON.stringify(books));
@@ -984,6 +998,19 @@ const App = () => {
     if (selectedBook && selectedBook.id === id) {
       setSelectedBook({ ...selectedBook, ...updates });
     }
+  };
+
+  const reorderBooks = (draggedBookId, targetBookId) => {
+    if (draggedBookId === targetBookId) return;
+    setBooks(prevBooks => {
+      const result = [...prevBooks];
+      const draggedIdx = result.findIndex(b => b.id === draggedBookId);
+      const targetIdx = result.findIndex(b => b.id === targetBookId);
+      if (draggedIdx === -1 || targetIdx === -1) return prevBooks;
+      const [removed] = result.splice(draggedIdx, 1);
+      result.splice(targetIdx, 0, removed);
+      return result;
+    });
   };
 
   const addHighlight = (bookId, highlight) => {
@@ -1752,12 +1779,15 @@ const App = () => {
                       is3DMode={is3DMode}
                       setIs3DMode={setIs3DMode}
                       libraryLayoutMode={libraryLayoutMode}
+                      shelfOrnaments={shelfOrnaments}
+                      setShelfOrnaments={setShelfOrnaments}
                       collections={collections}
                       setCollections={setCollections}
                       createCollection={createCollection}
                       onUpdateCollection={toggleBookInCollection}
                       handleDragOver={handleDragOver}
                       handleDrop={handleDrop}
+                      onReorderBooks={reorderBooks}
                       getQuoteOfTheDay={getQuoteOfTheDay}
                       setActiveQuoteIndex={setActiveQuoteIndex}
                       openQuoteCreator={openQuoteCreator}
@@ -2256,12 +2286,15 @@ const App = () => {
                       is3DMode={is3DMode}
                       setIs3DMode={setIs3DMode}
                       libraryLayoutMode={libraryLayoutMode}
+                      shelfOrnaments={shelfOrnaments}
+                      setShelfOrnaments={setShelfOrnaments}
                       collections={collections}
                       setCollections={setCollections}
                       createCollection={createCollection}
                       onUpdateCollection={toggleBookInCollection}
                       handleDragOver={handleDragOver}
                       handleDrop={handleDrop}
+                      onReorderBooks={reorderBooks}
                       getQuoteOfTheDay={getQuoteOfTheDay}
                       setActiveQuoteIndex={setActiveQuoteIndex}
                       openQuoteCreator={openQuoteCreator}
