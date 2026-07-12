@@ -2,7 +2,7 @@
   "name": "BookCircle",
   "short_name": "BookCircle",
   "description": "Sosyal Okuma ve Kütüphane Takip Platformu",
-  "start_url": "/",
+  "start_url": "/kitaplik/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#7B3F3F",
