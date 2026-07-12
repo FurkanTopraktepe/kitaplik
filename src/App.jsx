@@ -2040,7 +2040,19 @@ const App = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+              {/* Floating Return to Mobile Button for narrow screens in forced desktop mode */}
+              <button
+                onClick={() => {
+                  changeLayoutMode('mobile');
+                  setMobileTab('now-reading');
+                  setView('library');
+                }}
+                className="md:hidden fixed bottom-6 right-6 z-50 bg-[#7B3F3F] text-white p-3.5 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-xs font-bold"
+                style={{ boxShadow: '0 8px 24px rgba(123, 63, 63, 0.4)' }}
+              >
+                <Smartphone size={16} />
+                <span>Mobil Sürüme Dön</span>
+              </button>
             </div>
           </div>
         ) : (
