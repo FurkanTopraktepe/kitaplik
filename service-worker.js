@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bookcircle-cache-v1';
+const CACHE_NAME = 'bookcircle-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -34,17 +34,32 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        fetch(e.request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse));
-          }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      return fetch(e.request);
-    })
-  );
+  const isHtml = e.request.mode === 'navigate' || (e.request.headers.get('accept') && e.request.headers.get('accept').includes('text/html'));
+  if (isHtml) {
+    e.respondWith(
+      fetch(e.request).then((networkResponse) => {
+        if (networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
+        }
+        return networkResponse;
+      }).catch(() => {
+        return caches.match(e.request);
+      })
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          fetch(e.request).then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse));
+            }
+          }).catch(() => {});
+          return cachedResponse;
+        }
+        return fetch(e.request);
+      })
+    );
+  }
 });
