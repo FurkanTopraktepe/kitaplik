@@ -190,7 +190,7 @@ const BookCover = ({ book, onClick, onReorder }) => {
         <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
       ) : (
         /* Minimalist text layout on solid cover background */
-        <div className="w-full h-full p-2.5 flex flex-col justify-between text-white relative">
+        <div className="w-full h-full px-2.5 pb-2.5 pt-7 flex flex-col justify-between text-white relative">
           {/* Subtle overlay for realism */}
           <div className="absolute inset-0 bg-gradient-to-tr from-black/25 via-transparent to-white/15 pointer-events-none" />
           {/* Book Spine shadow overlay */}

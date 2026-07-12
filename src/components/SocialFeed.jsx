@@ -46,7 +46,7 @@ const SocialFeed = ({
       <div className={`
         fixed md:relative top-0 bottom-0 left-0 w-64 p-6 md:p-0
         flex flex-col gap-4 flex-shrink-0
-        bg-[#E8DCC8] dark:bg-[#2D2620] md:bg-transparent dark:md:bg-transparent
+        ${themeColors.sidebar} md:bg-transparent dark:md:bg-transparent
         border-r md:border-none border-gray-400/20
         h-screen md:h-auto overflow-y-auto
         z-50 md:z-auto transition-transform duration-300

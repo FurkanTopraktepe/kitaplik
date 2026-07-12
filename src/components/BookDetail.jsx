@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload, BookOpen, Trash2, Clock, Quote, Share2, Star, Zap } from 'lucide-react';
+import { X, Upload, BookOpen, Trash2, Clock, Quote, Share2, Star, Zap, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const BookDetail = ({
   book,
@@ -14,7 +14,8 @@ const BookDetail = ({
   onOpenReader,
   storeEbookFile,
   deleteEbookFile,
-  handleImageUpload
+  handleImageUpload,
+  onMoveBook
 }) => {
   const [newHighlight, setNewHighlight] = useState('');
 
@@ -369,6 +370,28 @@ const BookDetail = ({
                 )}
               </div>
             </div>
+
+            {onMoveBook && (
+              <div className="mb-4">
+                <label className={`block text-xs font-bold uppercase opacity-75 mb-2 ${isDark ? 'text-[#E8D4BA]' : 'text-[#654321]'}`}>Kitap Sıralaması (Raf Konumu)</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onMoveBook(book.id, 'left')}
+                    className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${isDark ? 'bg-[#2D2620] border-[#4A3B2F] text-[#E8D4BA]' : 'bg-[#E8DCC8] border-[#C8A882] text-[#654321]'}`}
+                  >
+                    <ArrowLeft size={14} />
+                    <span>Sola Taşı</span>
+                  </button>
+                  <button
+                    onClick={() => onMoveBook(book.id, 'right')}
+                    className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${isDark ? 'bg-[#2D2620] border-[#4A3B2F] text-[#E8D4BA]' : 'bg-[#E8DCC8] border-[#C8A882] text-[#654321]'}`}
+                  >
+                    <span>Sağa Taşı</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

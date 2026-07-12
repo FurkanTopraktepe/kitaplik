@@ -1013,6 +1013,30 @@ const App = () => {
     });
   };
 
+  const moveBook = (bookId, direction) => {
+    setBooks(prevBooks => {
+      const idx = prevBooks.findIndex(b => b.id === bookId);
+      if (idx === -1) return prevBooks;
+      
+      const targetStatus = prevBooks[idx].status;
+      const sameShelfBooks = prevBooks.filter(b => b.status === targetStatus);
+      const shelfIdx = sameShelfBooks.findIndex(b => b.id === bookId);
+      
+      const targetShelfIdx = direction === 'left' ? shelfIdx - 1 : shelfIdx + 1;
+      if (targetShelfIdx < 0 || targetShelfIdx >= sameShelfBooks.length) return prevBooks;
+      
+      const targetBookId = sameShelfBooks[targetShelfIdx].id;
+      
+      const result = [...prevBooks];
+      const mainIdx = result.findIndex(b => b.id === bookId);
+      const mainTargetIdx = result.findIndex(b => b.id === targetBookId);
+      
+      const [removed] = result.splice(mainIdx, 1);
+      result.splice(mainTargetIdx, 0, removed);
+      return result;
+    });
+  };
+
   const addHighlight = (bookId, highlight) => {
     if (highlight.trim()) {
       const book = books.find(b => b.id === bookId);
@@ -3196,6 +3220,7 @@ const App = () => {
           storeEbookFile={storeEbookFile}
           deleteEbookFile={deleteEbookFile}
           handleImageUpload={handleImageUpload}
+          onMoveBook={moveBook}
         />
       )}
 
