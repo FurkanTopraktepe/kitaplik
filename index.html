@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookCircle - Sosyal Okuma ve Kütüphane Takip Platformu</title>
+  
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="/kitaplik/manifest.json">
+  <meta name="theme-color" content="#7B3F3F">
+  <meta name="description" content="Sosyal Okuma ve Kütüphane Takip Platformu">
+  <link rel="icon" type="image/png" href="/kitaplik/icon.png">
+  <link rel="apple-touch-icon" href="/kitaplik/icon.png">
+
+  <!-- Preconnect and Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Global CDNs (IndexedDB, PWA support, PDF.js, epub.js, html2canvas, Chart.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/epubjs/0.3.88/epub.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    // Config worker URL for pdfjsLib
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+  </script>
+  <script type="module" crossorigin src="/kitaplik/assets/index-bad6ca6e.js"></script>
+  <link rel="stylesheet" href="/kitaplik/assets/index-e82385d1.css">
+</head>
+<body class="antialiased">
+  <div id="root"></div>
+  
+</body>
+</html>

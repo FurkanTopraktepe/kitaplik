@@ -1,0 +1,18 @@
+{
+  "name": "BookCircle",
+  "short_name": "BookCircle",
+  "description": "Sosyal Okuma ve Kütüphane Takip Platformu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#7B3F3F",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
