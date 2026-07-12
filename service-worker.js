@@ -1,9 +1,9 @@
 const CACHE_NAME = 'bookcircle-cache-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.jpg',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.png',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/epubjs/0.3.88/epub.min.js',
